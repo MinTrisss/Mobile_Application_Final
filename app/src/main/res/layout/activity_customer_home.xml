@@ -40,7 +40,7 @@
                 android:layout_weight="1"/>
 
             <ImageView
-                android:id="@+id/btnLogout"
+                android:id="@+id/btnLogoutCustomer"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:src="@drawable/ic_logout"

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Toolbar -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarAddCustomer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:title="Add Customer"
+            android:titleTextColor="@android:color/white" />
+
+        <!-- Section Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Customer Information"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="20dp" />
+
+        <!-- Full Name -->
+        <EditText
+            android:id="@+id/edtFullName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Full Name"
+            android:layout_marginTop="16dp" />
+
+        <!-- Email -->
+        <EditText
+            android:id="@+id/edtEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:layout_marginTop="12dp" />
+
+        <!-- Password -->
+        <EditText
+            android:id="@+id/edtPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:layout_marginTop="10dp"/>
+
+
+        <!-- Phone Number -->
+        <EditText
+            android:id="@+id/edtPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phone Number"
+            android:inputType="phone"
+            android:layout_marginTop="12dp" />
+
+        <!-- National ID (CMND/CCCD) -->
+        <EditText
+            android:id="@+id/edtNationalId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="National ID (CMND/CCCD)"
+            android:inputType="number"
+            android:layout_marginTop="12dp" />
+
+        <!-- Address -->
+        <EditText
+            android:id="@+id/edtAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address"
+            android:layout_marginTop="12dp" />
+
+        <!-- Date of Birth -->
+        <EditText
+            android:id="@+id/edtDOB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Date of Birth"
+            android:focusable="false"
+            android:clickable="true"
+            android:inputType="none"
+            android:layout_marginTop="10dp"/>
+
+
+        <!-- Gender -->
+        <RadioGroup
+            android:id="@+id/radioGender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
+
+            <RadioButton
+                android:id="@+id/radioMale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male" />
+
+            <RadioButton
+                android:id="@+id/radioFemale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female"
+                android:layout_marginStart="24dp" />
+        </RadioGroup>
+
+        <!-- Avatar URL -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Avatar"
+            android:textSize="16sp"
+            android:layout_marginTop="12dp" />
+
+        <ImageView
+            android:id="@+id/imgAvatarPreview"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_user"
+            android:scaleType="centerCrop"
+            android:background="@drawable/circle_bg"
+            android:padding="6dp"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/btnChooseImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Choose Image"
+            android:layout_marginTop="12dp" />
+
+
+        <!-- Button -->
+        <Button
+            android:id="@+id/btnAddCustomer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Customer"
+            android:layout_marginTop="24dp" />
+
+    </LinearLayout>
+
+</ScrollView>

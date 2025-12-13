@@ -90,41 +90,54 @@ class LoginActivity : AppCompatActivity() {
 
     private fun checkUserRoleAndNavigate() {
         val uid = auth.currentUser?.uid ?: return
-        val firestore = FirebaseFirestore.getInstance()
+        val db = FirebaseFirestore.getInstance()
 
-        firestore.collection("users").document(uid).get()
-            .addOnSuccessListener { document ->
+        // Step 1: Check Employee collection
+        db.collection("employees").document(uid).get()
+            .addOnSuccessListener { employeeDoc ->
 
-                if (!document.exists()) {
-                    Toast.makeText(this, "Account does not exist.", Toast.LENGTH_LONG).show()
-                    auth.signOut()
-                    return@addOnSuccessListener
-                }
-
-                val status = document.getString("status") ?: "normal"
-                if (status == "locked") {
-                    auth.signOut()
-                    Toast.makeText(this, "Account has been locked.", Toast.LENGTH_LONG).show()
-                    return@addOnSuccessListener
-                }
-
-                val role = document.getString("role")
-                when (role) {
-                    "employee" -> {
-                        navigateToEmployeeScreen()
-                    }
-                    "customer" -> {
-                        navigateToCustomerScreen()
-                    }
-                    else -> {
+                if (employeeDoc.exists()) {
+                    // OPTIONAL: check locked
+                    val status = employeeDoc.getString("status") ?: "normal"
+                    if (status == "locked") {
                         auth.signOut()
-                        Toast.makeText(this, "Role unavailable!", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Employee account is locked.", Toast.LENGTH_LONG).show()
+                        return@addOnSuccessListener
                     }
+
+                    // Navigate to employee home
+                    navigateToEmployeeScreen()
+                    return@addOnSuccessListener
                 }
+
+                // Step 2: Not employee → Check Customer collection
+                db.collection("customers").document(uid).get()
+                    .addOnSuccessListener { customerDoc ->
+
+                        if (customerDoc.exists()) {
+
+                            val status = customerDoc.getString("status") ?: "normal"
+                            if (status == "locked") {
+                                auth.signOut()
+                                Toast.makeText(this, "Customer account is locked.", Toast.LENGTH_LONG).show()
+                                return@addOnSuccessListener
+                            }
+
+                            navigateToCustomerScreen()
+                        } else {
+                            // Not found anywhere
+                            auth.signOut()
+                            Toast.makeText(this, "User data not found!", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    .addOnFailureListener {
+                        auth.signOut()
+                        Toast.makeText(this, "Cannot load customer info.", Toast.LENGTH_SHORT).show()
+                    }
             }
             .addOnFailureListener {
                 auth.signOut()
-                Toast.makeText(this, "Cannot check the account", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Cannot load employee info.", Toast.LENGTH_SHORT).show()
             }
     }
 
@@ -142,7 +155,7 @@ class LoginActivity : AppCompatActivity() {
         val intent = Intent(this, CustomerHomeActivity::class.java)
         intent.putExtra("userRole", "admin")
         startActivity(intent)
-        finish() // finish LoginActivity để không back lại
+        finish()
     }
 
 }

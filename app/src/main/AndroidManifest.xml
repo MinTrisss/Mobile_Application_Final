@@ -14,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Final_project">
         <activity
+            android:name=".AddCustomerActivity"
+            android:exported="false" />
+        <activity
             android:name=".EmployeeHomeActivity"
             android:exported="false" />
         <activity
