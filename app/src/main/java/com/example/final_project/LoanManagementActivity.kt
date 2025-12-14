@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,7 +19,14 @@ import com.google.firebase.firestore.Query
 import java.text.SimpleDateFormat
 import java.util.*
 
-data class Loan(val id: String, val accountId: Long, val amount: Double, val duration: String, val status: String, val createdAt: Date)
+data class Loan(
+    val id: String = "",
+    val accountId: String = "", // Sửa thành String
+    val amount: Double = 0.0,
+    val duration: String = "",
+    val status: String = "",
+    val createdAt: Date = Date()
+)
 
 class LoanManagementActivity : AppCompatActivity() {
 
@@ -55,7 +61,7 @@ class LoanManagementActivity : AppCompatActivity() {
             startActivityForResult(intent, RC_REGISTER_LOAN)
         }
     }
-
+    
     override fun onStart() {
         super.onStart()
         listenForLoanChanges()
@@ -66,33 +72,10 @@ class LoanManagementActivity : AppCompatActivity() {
         loansListener?.remove()
     }
 
-    private fun listenForLoanChanges() {
-        val customerId = auth.currentUser?.uid ?: return
-
-        val query = db.collection("accounts")
-            .whereEqualTo("customerId", customerId)
-            .whereEqualTo("type", "loan")
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-
-        loansListener = query.addSnapshotListener { snapshots, e ->
-            if (e != null) {
-                Toast.makeText(this, "Lỗi khi tải dữ liệu: ${e.message}", Toast.LENGTH_SHORT).show()
-                return@addSnapshotListener
-            }
-
-            loansList.clear()
-            for (doc in snapshots!!) {
-                val loan = Loan(
-                    id = doc.id,
-                    accountId = doc.getLong("accountId") ?: 0,
-                    amount = doc.getDouble("loan") ?: 0.0,
-                    duration = doc.getString("duration") ?: "N/A",
-                    status = doc.getString("status") ?: "N/A",
-                    createdAt = doc.getTimestamp("createdAt")?.toDate() ?: Date()
-                )
-                loansList.add(loan)
-            }
-            loansAdapter.notifyDataSetChanged()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_REGISTER_LOAN && resultCode == Activity.RESULT_OK) {
+            // Không cần làm gì ở đây nữa vì listener sẽ tự động cập nhật
         }
     }
 
@@ -100,6 +83,33 @@ class LoanManagementActivity : AppCompatActivity() {
         loansAdapter = LoanAdapter(loansList)
         rvLoans.layoutManager = LinearLayoutManager(this)
         rvLoans.adapter = loansAdapter
+    }
+
+    private fun listenForLoanChanges() {
+        val customerId = auth.currentUser?.uid ?: return
+
+        val query = db.collection("accounts")
+            .whereEqualTo("customerId", customerId)
+            .whereEqualTo("type", "loan")
+
+        loansListener = query.addSnapshotListener { snapshots, e ->
+            if (e != null) { return@addSnapshotListener }
+
+            loansList.clear()
+            for (doc in snapshots!!) {
+                 val loan = Loan(
+                    id = doc.id,
+                    accountId = doc.getString("accountId") ?: "", // Sửa thành getString
+                    amount = doc.getDouble("loan") ?: 0.0,
+                    duration = doc.getString("duration") ?: "N/A",
+                    status = doc.getString("status") ?: "N/A",
+                    createdAt = doc.getTimestamp("createdAt")?.toDate() ?: Date()
+                )
+                loansList.add(loan)
+            }
+            loansList.sortByDescending { it.createdAt }
+            loansAdapter.notifyDataSetChanged()
+        }
     }
     
     override fun onSupportNavigateUp(): Boolean {

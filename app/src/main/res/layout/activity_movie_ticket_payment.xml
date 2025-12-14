@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F9FAFB"
+    android:padding="16dp"
+    tools:context=".MovieTicketPaymentActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="22dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mua vé xem phim"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#1F2937"
+            android:layout_marginBottom="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chọn phim"
+                android:textSize="14sp"
+                android:textColor="#6B7280" />
+
+            <Spinner
+                android:id="@+id/spinnerMovies"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chọn suất chiếu"
+                android:textSize="14sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="16dp" />
+
+            <Spinner
+                android:id="@+id/spinnerShowtimes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chọn ghế"
+                android:textSize="14sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="16dp" />
+                
+            <GridLayout
+                android:id="@+id/gridSeats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="5"
+                android:layout_marginTop="8dp">
+                <!-- Seats will be added dynamically -->
+            </GridLayout>
+
+            <TextView
+                android:id="@+id/tvMovieTicketAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tổng tiền: 0 VNĐ"
+                android:textAlignment="textEnd"
+                android:textColor="#1F2937"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnPayMovieTicket"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#0FA958"
+            android:enabled="false"
+            android:text="Thanh toán qua VNPay"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+</ScrollView>

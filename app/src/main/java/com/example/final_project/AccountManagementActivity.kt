@@ -98,7 +98,7 @@ class AccountManagementActivity : AppCompatActivity() {
                 var foundSaving = false
 
                 for (document in accountsSnapshot) {
-                    val accountId = document.getLong("accountId")?.toString() ?: "N/A"
+                    val accountId = document.getString("accountId") ?: "N/A" // Sửa thành getString
                     when (document.getString("type")) {
                         "checking" -> {
                              tvCheckingAccountNumber.text = "Số tài khoản: $accountId"

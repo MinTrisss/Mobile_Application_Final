@@ -62,16 +62,10 @@ class TransferActivity : AppCompatActivity() {
             Toast.makeText(this, "Vui lòng nhập số tài khoản người nhận", Toast.LENGTH_SHORT).show()
             return
         }
-        val receiverAccountId = receiverAccountIdString.toLongOrNull()
-        if (receiverAccountId == null) {
-            Toast.makeText(this, "Số tài khoản không hợp lệ", Toast.LENGTH_SHORT).show()
-            return
-        }
 
-        // Find the receiver's checking account
         db.collection("accounts")
             .whereEqualTo("type", "checking")
-            .whereEqualTo("accountId", receiverAccountId)
+            .whereEqualTo("accountId", receiverAccountIdString) // Query với String
             .limit(1)
             .get()
             .addOnSuccessListener { accountSnapshot ->
@@ -84,7 +78,6 @@ class TransferActivity : AppCompatActivity() {
                 val receiverAccountDoc = accountSnapshot.documents[0]
                 val receiverCustomerId = receiverAccountDoc.getString("customerId") ?: ""
 
-                // **KIỂM TRA CHUYỂN TIỀN CHO CHÍNH MÌNH**
                 if (receiverCustomerId == auth.currentUser?.uid) {
                     Toast.makeText(this, "Không thể tự chuyển tiền cho chính mình", Toast.LENGTH_LONG).show()
                     isReceiverChecked = false
@@ -94,7 +87,6 @@ class TransferActivity : AppCompatActivity() {
 
                 receiverAccountRef = receiverAccountDoc.reference
 
-                // Find the customer's name
                 db.collection("customers").document(receiverCustomerId).get()
                     .addOnSuccessListener { customerDoc ->
                         if (customerDoc.exists()) {
@@ -133,7 +125,6 @@ class TransferActivity : AppCompatActivity() {
         val content = edtTransferContent.text.toString().ifEmpty { "Chuyen khoan noi bo" }
         val senderId = auth.currentUser?.uid ?: return
 
-        // Find sender's checking account first
         db.collection("accounts")
             .whereEqualTo("customerId", senderId)
             .whereEqualTo("type", "checking")
@@ -146,13 +137,11 @@ class TransferActivity : AppCompatActivity() {
                 }
                 val senderAccountRef = senderAccountSnapshot.documents[0].reference
 
-                // **Đảm bảo không tự chuyển cho mình lần nữa**
                 if (senderAccountRef.path == receiverAccountRef?.path) {
                     Toast.makeText(this, "Thao tác không hợp lệ.", Toast.LENGTH_SHORT).show()
                     return@addOnSuccessListener
                 }
 
-                // Run the transaction
                 db.runTransaction { transaction ->
                     val senderSnap = transaction.get(senderAccountRef)
                     val receiverSnap = transaction.get(receiverAccountRef!!)
@@ -162,8 +151,8 @@ class TransferActivity : AppCompatActivity() {
                         throw Exception("Số dư không đủ để thực hiện giao dịch.")
                     }
 
-                    val fromAccountId = senderSnap.getLong("accountId")?.toString() ?: ""
-                    val toAccountId = receiverSnap.getLong("accountId")?.toString() ?: ""
+                    val fromAccountId = senderSnap.getString("accountId") ?: ""
+                    val toAccountId = receiverSnap.getString("accountId") ?: ""
 
                     transaction.update(senderAccountRef, "balance", senderBalance - transferAmount)
                     transaction.update(receiverAccountRef!!, "balance", receiverSnap.getDouble("balance")!! + transferAmount)
@@ -172,8 +161,8 @@ class TransferActivity : AppCompatActivity() {
                     val transactionRecord = hashMapOf(
                         "transactionId" to transactionId,
                         "customerId" to senderId, 
-                        "fromAccountId" to fromAccountId,
-                        "toAccountId" to toAccountId,
+                        "fromAccountId" to fromAccountId, // Lưu dưới dạng String
+                        "toAccountId" to toAccountId,   // Lưu dưới dạng String
                         "amount" to transferAmount,
                         "note" to content,
                         "status" to "Thành công",
@@ -185,7 +174,7 @@ class TransferActivity : AppCompatActivity() {
                     null
                 }.addOnSuccessListener {
                     Toast.makeText(this, "Chuyển khoản thành công!", Toast.LENGTH_SHORT).show()
-                    setResult(Activity.RESULT_OK) // Trả về kết quả để màn hình Home biết cần cập nhật
+                    setResult(Activity.RESULT_OK)
                     finish()
                 }.addOnFailureListener { e ->
                     Toast.makeText(this, "Giao dịch thất bại: ${e.message}", Toast.LENGTH_LONG).show()

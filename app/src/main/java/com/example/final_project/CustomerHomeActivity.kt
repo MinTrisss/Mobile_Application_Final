@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -84,7 +83,7 @@ class CustomerHomeActivity : AppCompatActivity() {
                 if (snapshots != null && !snapshots.isEmpty) {
                     val doc = snapshots.documents[0]
                     val balance = doc.getDouble("balance") ?: 0.0
-                    val accountId = doc.getLong("accountId") ?: 0
+                    val accountId = doc.getString("accountId") ?: "N/A"
                     txtBalance.text = String.format("%,.0f VNĐ", balance)
                     txtAccountNumber.text = "Số tài khoản: $accountId"
                 } else {
@@ -114,5 +113,27 @@ class CustomerHomeActivity : AppCompatActivity() {
         findViewById<View>(R.id.btnAccountManagement).setOnClickListener {
             startActivity(Intent(this, AccountManagementActivity::class.java))
         }
+
+        findViewById<View>(R.id.btnUtilitiesElectric).setOnClickListener {
+            openProviderSelection("Điện")
+        }
+
+        findViewById<View>(R.id.btnUtilitiesWater).setOnClickListener {
+            openProviderSelection("Nước")
+        }
+
+        findViewById<View>(R.id.btnUtilitiesTicket).setOnClickListener {
+            startActivity(Intent(this, MovieTicketPaymentActivity::class.java))
+        }
+
+        findViewById<View>(R.id.btnUtilitiesPhone).setOnClickListener {
+             openProviderSelection("Nạp tiền")
+        }
+    }
+
+    private fun openProviderSelection(serviceType: String) {
+        val intent = Intent(this, ProviderSelectionActivity::class.java)
+        intent.putExtra("serviceType", serviceType)
+        startActivity(intent)
     }
 }
