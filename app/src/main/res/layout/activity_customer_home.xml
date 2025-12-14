@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main"
+    android:background="#F9FAFB"
     android:padding="16dp">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Header -->
+        <!-- HEADER -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -19,66 +22,79 @@
 
             <ImageView
                 android:id="@+id/imgAvatar"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/ic_user"
-                android:background="@drawable/circle_bg"
-                android:padding="5dp" />
+                android:background="@drawable/bg_circle_green_light"
+                android:padding="10dp" />
 
             <TextView
                 android:id="@+id/txtWelcome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Welcome, Customer"
-                android:textSize="20sp"
+                android:text="Xin chào, Khách hàng"
+                android:textSize="18sp"
                 android:textStyle="bold"
+                android:textColor="#0FA958"
                 android:layout_marginStart="12dp" />
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
 
             <ImageView
                 android:id="@+id/btnLogoutCustomer"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:src="@drawable/ic_logout"
-                android:padding="4dp"/>
+                app:tint="#0FA958" />
         </LinearLayout>
 
-
-        <!-- Balance Card -->
+        <!-- ACCOUNT OVERVIEW -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            >
+            android:background="@drawable/bg_card"
+            android:padding="16dp"
+            android:layout_marginTop="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Main Account Balance"
-                android:textSize="16sp"/>
+                android:text="Tài khoản thanh toán"
+                android:textSize="14sp"
+                android:textColor="#6B7280"/>
+
+            <TextView
+                android:id="@+id/txtAccountNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Số tài khoản: CUS0000"
+                android:textSize="13sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="4dp"/>
 
             <TextView
                 android:id="@+id/txtBalance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="25,450,000 VND"
+                android:text="0 VNĐ"
                 android:textSize="32sp"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp"/>
+                android:textColor="#0FA958"
+                android:layout_marginTop="12dp"/>
         </LinearLayout>
 
-
-        <!-- Bank Actions -->
+        <!-- BANKING ACTIONS -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Banking Actions"
+            android:text="Giao dịch ngân hàng"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="#1F2937"
             android:layout_marginTop="28dp"/>
 
         <GridLayout
@@ -87,107 +103,94 @@
             android:columnCount="4"
             android:layout_marginTop="12dp">
 
-            <!-- Transfer -->
+            <!-- Internal Transfer -->
             <LinearLayout
+                android:id="@+id/btnInternalTransfer"
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="8dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1">
+                android:padding="12dp">
 
                 <ImageView
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/ic_transfer"/>
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/ic_transfer"
+                    android:background="@drawable/bg_circle_green_light"
+                    android:padding="10dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Transfer"
-                    android:textSize="14sp"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"/>
+                    android:textAlignment="center"
+                    android:text="Chuyển khoản"
+                    android:textSize="13sp"
+                    android:textColor="#1F2937"
+                    android:layout_marginTop="8dp"/>
             </LinearLayout>
 
-            <!-- Deposit -->
+
+            <!-- Transaction History -->
             <LinearLayout
+                android:id="@+id/btnTransactionHistory"
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="8dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1">
+                android:padding="12dp">
 
                 <ImageView
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/ic_deposit"/>
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/ic_history"
+                    android:background="@drawable/bg_circle_green_light"
+                    android:padding="10dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Deposit"
-                    android:textSize="14sp"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"/>
+                    android:textAlignment="center"
+                    android:text="Lịch sử giao dịch"
+                    android:textSize="13sp"
+                    android:textColor="#1F2937"
+                    android:layout_marginTop="8dp"/>
             </LinearLayout>
 
-            <!-- Withdraw -->
+            <!-- Account Management -->
             <LinearLayout
+                android:id="@+id/btnAccountManagement"
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="8dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1">
+                android:padding="12dp">
 
                 <ImageView
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/ic_withdraw"/>
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/ic_withdraw"
+                    android:background="@drawable/bg_circle_green_light"
+                    android:padding="10dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Withdraw"
-                    android:textSize="14sp"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"/>
-            </LinearLayout>
-
-            <!-- History -->
-            <LinearLayout
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="8dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1">
-
-                <ImageView
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/ic_history"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="History"
-                    android:textSize="14sp"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"/>
+                    android:textAlignment="center"
+                    android:text="Quản lý tài khoản"
+                    android:textSize="13sp"
+                    android:textColor="#1F2937"
+                    android:layout_marginTop="8dp"/>
             </LinearLayout>
         </GridLayout>
 
-
-        <!-- Utilities -->
+        <!-- UTILITIES -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Utilities"
+            android:text="Dịch vụ tiện ích"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="#1F2937"
             android:layout_marginTop="28dp"/>
 
         <GridLayout
@@ -196,96 +199,104 @@
             android:columnCount="4"
             android:layout_marginTop="12dp">
 
-            <!-- Electricity -->
             <LinearLayout
+                android:id="@+id/btnUtilitiesElectric"
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="8dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1">
+                android:padding="12dp">
 
                 <ImageView
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/ic_electricity"/>
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/ic_electricity"
+                    android:background="@drawable/bg_circle_green_light"
+                    android:padding="10dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Electricity"
-                    android:textSize="14sp"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"/>
+                    android:textAlignment="center"
+                    android:layout_marginTop="8dp"
+                    android:text="Tiền điện"
+                    android:textColor="#1F2937"
+                    android:textSize="13sp" />
             </LinearLayout>
 
-            <!-- Water -->
             <LinearLayout
+                android:id="@+id/btnUtilitiesWater"
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="8dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1">
+                android:padding="12dp">
 
                 <ImageView
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/ic_water"/>
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/ic_water"
+                    android:background="@drawable/bg_circle_green_light"
+                    android:padding="10dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Water"
-                    android:textSize="14sp"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"/>
+                    android:textAlignment="center"
+                    android:text="Tiền nước"
+                    android:textSize="13sp"
+                    android:textColor="#1F2937"
+                    android:layout_marginTop="8dp"/>
             </LinearLayout>
 
-            <!-- Phone -->
             <LinearLayout
+                android:id="@+id/btnUtilitiesPhone"
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="8dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1">
+                android:padding="12dp">
 
                 <ImageView
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/ic_phone"/>
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/ic_phone"
+                    android:background="@drawable/bg_circle_green_light"
+                    android:padding="10dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Top up"
-                    android:textSize="14sp"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"/>
+                    android:textAlignment="center"
+                    android:text="Nạp tiền điện thoại"
+                    android:textSize="13sp"
+                    android:textColor="#1F2937"
+                    android:layout_marginTop="8dp"/>
             </LinearLayout>
 
-            <!-- Tickets -->
             <LinearLayout
+                android:id="@+id/btnUtilitiesTicket"
+                android:layout_width="0dp"
+                android:layout_columnWeight="1"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:padding="8dp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1">
+                android:padding="12dp">
 
                 <ImageView
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
-                    android:src="@drawable/ic_ticket"/>
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:src="@drawable/ic_ticket"
+                    android:background="@drawable/bg_circle_green_light"
+                    android:padding="10dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tickets"
-                    android:textSize="14sp"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center"/>
+                    android:textAlignment="center"
+                    android:text="Mua vé"
+                    android:textSize="13sp"
+                    android:textColor="#1F2937"
+                    android:layout_marginTop="8dp"/>
             </LinearLayout>
         </GridLayout>
 
