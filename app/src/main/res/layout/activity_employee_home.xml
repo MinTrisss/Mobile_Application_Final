@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Header giống customer -->
+    <!-- ===== HEADER ===== -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="52dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <!-- Avatar -->
         <ImageView
             android:id="@+id/imgOfficer"
             android:layout_width="50dp"
@@ -22,7 +22,6 @@
             android:padding="5dp"
             android:src="@drawable/ic_user" />
 
-        <!-- Title -->
         <TextView
             android:id="@+id/txtOfficerTitle"
             android:layout_width="wrap_content"
@@ -32,13 +31,11 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <!-- Spacer -->
         <View
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <!-- Logout button -->
         <ImageView
             android:id="@+id/btnLogoutEmployee"
             android:layout_width="30dp"
@@ -47,41 +44,58 @@
             android:src="@drawable/ic_logout" />
     </LinearLayout>
 
-    <!-- Action Buttons -->
+    <!-- ===== ACTION BUTTONS ===== -->
     <Button
         android:id="@+id/btnAddCustomer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Create Customer Account"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="16dp" />
 
     <Button
         android:id="@+id/btnAdjustRate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Adjust Saving Rates"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="8dp" />
 
     <Button
         android:id="@+id/btnEKYC"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Verify Customer eKYC"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="8dp" />
 
-    <!-- Customer List -->
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- ===== SEARCH & SORT ===== -->
+    <LinearLayout
+        android:id="@+id/layoutSearchSort"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Customer List"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginTop="25dp"/>
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical">
 
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/searchView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:queryHint="Search customer"
+            app:iconifiedByDefault="false" />
+
+        <Spinner
+            android:id="@+id/spinnerSort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- ===== CUSTOMER LIST ===== -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerCustomers"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="10dp"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp" />
 
 </LinearLayout>

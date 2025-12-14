@@ -63,6 +63,8 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx:24.11.0")
     implementation("com.google.firebase:firebase-auth-ktx:22.3.1")
     implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
 
 
     testImplementation(libs.junit)

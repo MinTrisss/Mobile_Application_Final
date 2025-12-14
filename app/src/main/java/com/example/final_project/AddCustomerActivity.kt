@@ -27,12 +27,13 @@ class AddCustomerActivity : AppCompatActivity() {
     private lateinit var edtPhone: EditText
     private lateinit var edtNationalId: EditText
     private lateinit var edtDOB: EditText
-    private lateinit var edtPassword: EditText   // ➕ cho login
+    private lateinit var edtPassword: EditText
     private lateinit var edtAddress: EditText
     private lateinit var radioGroupGender: RadioGroup
     private lateinit var btnAddCustomer: Button
     private lateinit var btnChooseImage: Button
     private lateinit var imgAvatarPreview: ImageView
+
 
     private var imageUri: Uri? = null
     private val PICK_IMAGE_REQUEST = 1001
@@ -197,7 +198,7 @@ class AddCustomerActivity : AppCompatActivity() {
         nationalId: String,
         dob: Timestamp,
         gender: String,
-        address: String
+        address: String,
     ) {
         if (imageUri == null) {
             saveCustomer(uid, customerId, name, email, phone, nationalId, dob, gender, address, "")
@@ -212,7 +213,7 @@ class AddCustomerActivity : AppCompatActivity() {
                 storageRef.downloadUrl.addOnSuccessListener { uri ->
                     saveCustomer(
                         uid, customerId, name, email, phone,
-                        nationalId, dob, gender, address, uri.toString()
+                        nationalId, dob, gender, address, uri.toString(),
                     )
                 }
             }

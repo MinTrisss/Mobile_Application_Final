@@ -91,6 +91,12 @@
             android:inputType="none"
             android:layout_marginTop="10dp"/>
 
+        <EditText
+            android:id="@+id/edtEKYC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="eKYC Status"
+            android:layout_marginTop="12dp" />
 
         <!-- Gender -->
         <RadioGroup
