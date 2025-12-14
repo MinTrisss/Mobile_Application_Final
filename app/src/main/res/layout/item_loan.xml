@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="12dp"
+    android:background="@drawable/bg_card"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:elevation="3dp">
+
+    <!-- HEADER: Loan ID + Status -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvLoanId"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Mã khoản vay #123456789"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#1F2937" />
+
+        <TextView
+            android:id="@+id/tvLoanStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_status_pending"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:text="Chờ duyệt"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+    <!-- AMOUNT -->
+    <TextView
+        android:id="@+id/tvLoanAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="50,000,000 VNĐ"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#0FA958" />
+
+    <!-- DURATION -->
+    <TextView
+        android:id="@+id/tvLoanDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Kỳ hạn: 3 năm"
+        android:textSize="14sp"
+        android:textColor="#6B7280" />
+
+    <!-- DATE -->
+    <TextView
+        android:id="@+id/tvLoanDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Ngày đăng ký: 20/05/2024"
+        android:textSize="14sp"
+        android:textColor="#6B7280" />
+
+</LinearLayout>

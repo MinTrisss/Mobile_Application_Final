@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F9FAFB"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- TITLE -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đăng ký khoản vốn"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#1F2937"
+            android:layout_marginBottom="16dp" />
+
+        <!-- LOAN INFO CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- LOAN AMOUNT -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Số tiền cần vay"
+                android:textSize="14sp"
+                android:textColor="#6B7280" />
+
+            <EditText
+                android:id="@+id/edtLoanAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nhập số tiền (VNĐ)"
+                android:inputType="number"
+                android:layout_marginTop="6dp" />
+
+            <!-- DURATION -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thời hạn vay"
+                android:textSize="14sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="16dp" />
+
+            <Spinner
+                android:id="@+id/spinnerLoanDuration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp" />
+
+            <!-- INTEREST RATE -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lãi suất"
+                android:textSize="14sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/tvLoanInterest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="9.5% / năm"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#DC2626"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
+        <!-- REGISTER BUTTON -->
+        <Button
+            android:id="@+id/btnRegisterLoanConfirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Xác nhận đăng ký"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="#0FA958"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+</ScrollView>

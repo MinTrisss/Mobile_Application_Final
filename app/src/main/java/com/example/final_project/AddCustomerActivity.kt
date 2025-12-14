@@ -27,7 +27,7 @@ class AddCustomerActivity : AppCompatActivity() {
     private lateinit var edtPhone: EditText
     private lateinit var edtNationalId: EditText
     private lateinit var edtDOB: EditText
-    private lateinit var edtPassword: EditText   // ➕ cho login
+    private lateinit var edtPassword: EditText   // cho login
     private lateinit var edtAddress: EditText
     private lateinit var radioGroupGender: RadioGroup
     private lateinit var btnAddCustomer: Button

@@ -19,8 +19,28 @@
         <activity
             android:name=".EmployeeHomeActivity"
             android:exported="false" />
+
+        <!-- CUSTOMER -->
         <activity
             android:name=".CustomerHomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TransferActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TransactionHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AccountManagementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".OpenSavingAccountActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterLoanActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoanManagementActivity" 
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
