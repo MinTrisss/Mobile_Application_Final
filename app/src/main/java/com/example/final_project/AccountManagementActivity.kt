@@ -93,12 +93,12 @@ class AccountManagementActivity : AppCompatActivity() {
             }
         }
         
-        db.collection("accounts").whereEqualTo("customerId", uid).get()
+        db.collection("accounts").whereEqualTo("uid", uid).get()
             .addOnSuccessListener { accountsSnapshot ->
                 var foundSaving = false
 
                 for (document in accountsSnapshot) {
-                    val accountId = document.getLong("accountId")?.toString() ?: "N/A"
+                    val accountId = document.getString("accountId") ?: "N/A" // Sửa thành getString
                     when (document.getString("type")) {
                         "checking" -> {
                              tvCheckingAccountNumber.text = "Số tài khoản: $accountId"
@@ -157,15 +157,15 @@ class AccountManagementActivity : AppCompatActivity() {
     }
 
     private fun performSettleTransaction() {
-        val customerId = auth.currentUser?.uid
+        val uid = auth.currentUser?.uid
         val savingDocId = savingAccountDocId
-        if (customerId == null || savingDocId == null) {
+        if (uid == null || savingDocId == null) {
             Toast.makeText(this, "Lỗi: Không tìm thấy thông tin tài khoản.", Toast.LENGTH_SHORT).show()
             return
         }
 
         db.collection("accounts")
-            .whereEqualTo("customerId", customerId)
+            .whereEqualTo("uid", uid)
             .whereEqualTo("type", "checking")
             .limit(1)
             .get()

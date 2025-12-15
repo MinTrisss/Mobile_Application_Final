@@ -75,7 +75,6 @@ class OpenSavingAccountActivity : AppCompatActivity() {
         }
         val uid = currentUser.uid
 
-        // BƯỚC 1: TÌM TÀI KHOẢN THANH TOÁN TRƯỚC KHI BẮT ĐẦU TRANSACTION
         db.collection("accounts")
             .whereEqualTo("uid", uid)
             .whereEqualTo("type", "checking")
@@ -89,7 +88,6 @@ class OpenSavingAccountActivity : AppCompatActivity() {
                 
                 val checkingAccountRef = checkingAccountSnapshot.documents[0].reference
 
-                // BƯỚC 2: CHẠY TRANSACTION SAU KHI ĐÃ CÓ THAM CHIẾU
                 db.runTransaction { transaction ->
                     val checkingSnap = transaction.get(checkingAccountRef)
                     val currentBalance = checkingSnap.getDouble("balance") ?: 0.0
@@ -98,7 +96,7 @@ class OpenSavingAccountActivity : AppCompatActivity() {
                         throw Exception("Số dư tài khoản thanh toán không đủ.")
                     }
 
-                    val newSavingAccountId = ThreadLocalRandom.current().nextLong(1_000_000_000L, 10_000_000_000L)
+                    val newSavingAccountId = ThreadLocalRandom.current().nextLong(1_000_000_000L, 10_000_000_000L).toString() // Chuyển sang String
                     val selectedTerm = spinnerSavingTerm.selectedItem.toString()
                     val newSavingAccount = hashMapOf(
                         "accountId" to newSavingAccountId,

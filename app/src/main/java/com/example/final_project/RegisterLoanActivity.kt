@@ -75,14 +75,14 @@ class RegisterLoanActivity : AppCompatActivity() {
         }
         val uid = currentUser.uid
 
-        val newLoanAccountId = ThreadLocalRandom.current().nextLong(1_000_000_000L, 10_000_000_000L)
+        val newLoanAccountId = ThreadLocalRandom.current().nextLong(1_000_000_000L, 10_000_000_000L).toString() // Chuyển sang String
         val selectedDuration = spinnerLoanDuration.selectedItem.toString()
 
         val newLoanApplication = hashMapOf(
             "accountId" to newLoanAccountId,
             "uid" to uid,
             "type" to "loan",
-            "status" to "Chờ duyệt", // Trạng thái chờ duyệt
+            "status" to "Chờ duyệt",
             "createdAt" to Timestamp.now(),
             "duration" to selectedDuration,
             "loan" to loanAmount
@@ -92,7 +92,7 @@ class RegisterLoanActivity : AppCompatActivity() {
             .add(newLoanApplication)
             .addOnSuccessListener {
                 Toast.makeText(this, "Đơn đăng ký vay của bạn đã được gửi và đang chờ xét duyệt.", Toast.LENGTH_LONG).show()
-                setResult(Activity.RESULT_OK) // Trả về kết quả thành công
+                setResult(Activity.RESULT_OK)
                 finish()
             }
             .addOnFailureListener { e ->

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="replace" />
 
     <application
         android:allowBackup="true"
@@ -45,6 +46,27 @@
             android:exported="false" />
         <activity
             android:name=".LoanManagementActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ElectricityPaymentActivity" 
+            android:exported="false" />
+        <activity
+            android:name=".WaterPaymentActivity" 
+            android:exported="false" />
+        <activity
+            android:name=".MovieTicketPaymentActivity" 
+            android:exported="false" />
+        <activity
+            android:name=".PhoneTopUpActivity" 
+            android:exported="false" />
+        <activity
+            android:name=".ProviderSelectionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TicketDetailsActivity" 
+            android:exported="false" />
+        <activity
+            android:name=".VnPayGatewayActivity" 
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
