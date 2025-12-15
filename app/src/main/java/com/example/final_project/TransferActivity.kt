@@ -82,10 +82,10 @@ class TransferActivity : AppCompatActivity() {
                     return@addOnSuccessListener
                 }
                 val receiverAccountDoc = accountSnapshot.documents[0]
-                val receiverCustomerId = receiverAccountDoc.getString("customerId") ?: ""
+                val receiverUid = receiverAccountDoc.getString("uid") ?: ""
 
                 // **KIỂM TRA CHUYỂN TIỀN CHO CHÍNH MÌNH**
-                if (receiverCustomerId == auth.currentUser?.uid) {
+                if (receiverUid == auth.currentUser?.uid) {
                     Toast.makeText(this, "Không thể tự chuyển tiền cho chính mình", Toast.LENGTH_LONG).show()
                     isReceiverChecked = false
                     tvReceiverName.visibility = View.GONE
@@ -95,7 +95,7 @@ class TransferActivity : AppCompatActivity() {
                 receiverAccountRef = receiverAccountDoc.reference
 
                 // Find the customer's name
-                db.collection("customers").document(receiverCustomerId).get()
+                db.collection("customers").document(receiverUid).get()
                     .addOnSuccessListener { customerDoc ->
                         if (customerDoc.exists()) {
                             val receiverName = customerDoc.getString("name") ?: "N/A"
@@ -135,7 +135,7 @@ class TransferActivity : AppCompatActivity() {
 
         // Find sender's checking account first
         db.collection("accounts")
-            .whereEqualTo("customerId", senderId)
+            .whereEqualTo("uid", senderId)
             .whereEqualTo("type", "checking")
             .limit(1)
             .get()
@@ -171,7 +171,7 @@ class TransferActivity : AppCompatActivity() {
                     val transactionId = "T${System.currentTimeMillis()}"
                     val transactionRecord = hashMapOf(
                         "transactionId" to transactionId,
-                        "customerId" to senderId, 
+                        "uid" to senderId,
                         "fromAccountId" to fromAccountId,
                         "toAccountId" to toAccountId,
                         "amount" to transferAmount,

@@ -69,14 +69,14 @@
                 android:id="@+id/btnDelete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DELETE"
+                android:text="XOÁ"
                 android:layout_marginBottom="8dp"/>
 
             <Button
                 android:id="@+id/btnEdit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="EDIT"/>
+                android:text="SỬA"/>
         </LinearLayout>
 
     </LinearLayout>

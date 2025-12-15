@@ -14,13 +14,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Final_project">
         <activity
+            android:name=".EditCustomerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CustomerDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddCustomerActivity"
             android:exported="false" />
         <activity
             android:name=".EmployeeHomeActivity"
-            android:exported="false" />
-
-        <!-- CUSTOMER -->
+            android:exported="false" /> <!-- CUSTOMER -->
         <activity
             android:name=".CustomerHomeActivity"
             android:exported="false" />
@@ -40,7 +44,7 @@
             android:name=".RegisterLoanActivity"
             android:exported="false" />
         <activity
-            android:name=".LoanManagementActivity" 
+            android:name=".LoanManagementActivity"
             android:exported="false" />
         <activity
             android:name=".LoginActivity"

@@ -21,6 +21,8 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var edtEmail: EditText
     private lateinit var edtPassword: EditText
     private lateinit var btnLogin: Button
+    private val db = FirebaseFirestore.getInstance()
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,61 +33,99 @@ class LoginActivity : AppCompatActivity() {
         Log.d("LOGIN", "LoginActivity loaded")
 
         auth = FirebaseAuth.getInstance()
+        auth.firebaseAuthSettings
+            .setAppVerificationDisabledForTesting(true)
         edtEmail = findViewById(R.id.edtEmail)
         edtPassword = findViewById(R.id.edtPassword)
         btnLogin = findViewById(R.id.btnLogin)
 
-        val db = FirebaseFirestore.getInstance()
 
         btnLogin.setOnClickListener {
-            val email = edtEmail.text.toString().trim()
+
+            val input = edtEmail.text.toString().trim()   // email OR phone
             val password = edtPassword.text.toString().trim()
 
-
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Email and password must not be empty", Toast.LENGTH_SHORT).show()
+            if (input.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Email/SĐT không được để trống!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        val currentUser = auth.currentUser
-                        val uid = currentUser?.uid ?: return@addOnCompleteListener
-                        val emailLogged = currentUser.email ?: email
-
-                        val logData = hashMapOf(
-                            "uid" to uid,
-                            "email" to emailLogged,
-                            "loginTime" to com.google.firebase.Timestamp.now()
-                        )
-
-                        db.collection("loginHistory")
-                            .add(logData)
-                            .addOnSuccessListener {
-                                Log.d("LOGIN_HISTORY", "Login logged successfully")
-                            }
-                            .addOnFailureListener { e ->
-                                Log.e("LOGIN_HISTORY", "Failed to log login", e)
-                            }
-
-                        checkUserRoleAndNavigate()
-                    } else {
-                        Toast.makeText(
-                            this,
-                            task.exception?.message ?: "Authentication failed",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                    }
-                }
+            if (input.contains("@")) {
+                loginWithEmail(input, password)
+            }
+            else {
+                loginWithPhone(input, password)
+            }
         }
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    private fun loginWithEmail(email: String, password: String) {
+
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener {
+                logLoginHistory()
+                checkUserRoleAndNavigate()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, it.message ?: "Đăng nhập thất bại!", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun loginWithPhone(phone: String, password: String) {
+
+        db.collection("customers")
+            .whereEqualTo("phoneNum", phone)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { snap ->
+
+                if (snap.isEmpty) {
+                    Toast.makeText(this, "Số điện thoại không tồn tại!", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+
+                val email = snap.documents[0].getString("email")
+                if (email.isNullOrEmpty()) {
+                    Toast.makeText(this, "Email không tồn tại!", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+
+                auth.signInWithEmailAndPassword(email, password)
+                    .addOnSuccessListener {
+                        logLoginHistory()
+                        checkUserRoleAndNavigate()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, it.message ?: "Đăng nhập thất bại", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun logLoginHistory() {
+
+        val currentUser = auth.currentUser ?: return
+
+        val logData = hashMapOf(
+            "uid" to currentUser.uid,
+            "email" to currentUser.email,
+            "loginTime" to com.google.firebase.Timestamp.now()
+        )
+
+        db.collection("loginHistory")
+            .add(logData)
+            .addOnFailureListener {
+                Log.e("LOGIN_HISTORY", "Failed to log login", it)
+            }
     }
 
     private fun checkUserRoleAndNavigate() {
@@ -98,10 +138,10 @@ class LoginActivity : AppCompatActivity() {
 
                 if (employeeDoc.exists()) {
                     // OPTIONAL: check locked
-                    val status = employeeDoc.getString("status") ?: "normal"
-                    if (status == "locked") {
+                    val status = employeeDoc.getString("status") ?: "Hoạt động"
+                    if (status == "Đã khoá") {
                         auth.signOut()
-                        Toast.makeText(this, "Employee account is locked.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "Tài khoản đã bị khoá!", Toast.LENGTH_LONG).show()
                         return@addOnSuccessListener
                     }
 
@@ -116,10 +156,10 @@ class LoginActivity : AppCompatActivity() {
 
                         if (customerDoc.exists()) {
 
-                            val status = customerDoc.getString("status") ?: "normal"
-                            if (status == "locked") {
+                            val status = customerDoc.getString("status") ?: "Hoạt động"
+                            if (status == "Đã khoá") {
                                 auth.signOut()
-                                Toast.makeText(this, "Customer account is locked.", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this, "Tài khoản đã bị khoá!", Toast.LENGTH_LONG).show()
                                 return@addOnSuccessListener
                             }
 
@@ -127,23 +167,23 @@ class LoginActivity : AppCompatActivity() {
                         } else {
                             // Not found anywhere
                             auth.signOut()
-                            Toast.makeText(this, "User data not found!", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this, "Không tìm thấy tài khoản!", Toast.LENGTH_LONG).show()
                         }
                     }
                     .addOnFailureListener {
                         auth.signOut()
-                        Toast.makeText(this, "Cannot load customer info.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Không thể tải thông tin khách hàng!", Toast.LENGTH_SHORT).show()
                     }
             }
             .addOnFailureListener {
                 auth.signOut()
-                Toast.makeText(this, "Cannot load employee info.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Không thể tải thông tin nhân viên!", Toast.LENGTH_SHORT).show()
             }
     }
 
 
     private fun navigateToEmployeeScreen() {
-        Toast.makeText(applicationContext, "Successfully logged in to employee screen", Toast.LENGTH_LONG).show()
+        Toast.makeText(applicationContext, "Bạn đã đăng nhập thành công.", Toast.LENGTH_LONG).show()
         val intent = Intent(this, EmployeeHomeActivity::class.java)
         intent.putExtra("userRole", "employee")
         startActivity(intent)
@@ -151,9 +191,9 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun navigateToCustomerScreen() {
-        Toast.makeText(applicationContext, "Successfully logged in to customer screen", Toast.LENGTH_LONG).show()
+        Toast.makeText(applicationContext, "Bạn đã đăng nhập thành công.", Toast.LENGTH_LONG).show()
         val intent = Intent(this, CustomerHomeActivity::class.java)
-        intent.putExtra("userRole", "admin")
+        intent.putExtra("userRole", "customer")
         startActivity(intent)
         finish()
     }

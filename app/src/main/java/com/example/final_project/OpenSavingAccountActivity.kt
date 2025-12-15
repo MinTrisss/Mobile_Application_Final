@@ -73,11 +73,11 @@ class OpenSavingAccountActivity : AppCompatActivity() {
             Toast.makeText(this, "Không thể xác thực người dùng.", Toast.LENGTH_SHORT).show()
             return
         }
-        val customerId = currentUser.uid
+        val uid = currentUser.uid
 
         // BƯỚC 1: TÌM TÀI KHOẢN THANH TOÁN TRƯỚC KHI BẮT ĐẦU TRANSACTION
         db.collection("accounts")
-            .whereEqualTo("customerId", customerId)
+            .whereEqualTo("uid", uid)
             .whereEqualTo("type", "checking")
             .limit(1)
             .get()
@@ -102,7 +102,7 @@ class OpenSavingAccountActivity : AppCompatActivity() {
                     val selectedTerm = spinnerSavingTerm.selectedItem.toString()
                     val newSavingAccount = hashMapOf(
                         "accountId" to newSavingAccountId,
-                        "customerId" to customerId,
+                        "uid" to uid,
                         "type" to "saving",
                         "createdAt" to Timestamp.now(),
                         "Term" to selectedTerm,

@@ -9,6 +9,8 @@ import android.os.Bundle
 //import android.view.MenuItem
 import android.util.Log
 import android.app.DatePickerDialog
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -70,6 +72,22 @@ class AddCustomerActivity : AppCompatActivity() {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_add_customer, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     // Pick avatar
     private fun pickImageFromGallery() {
         val intent = Intent(Intent.ACTION_PICK)
@@ -97,23 +115,42 @@ class AddCustomerActivity : AppCompatActivity() {
 
         val genderId = radioGroupGender.checkedRadioButtonId
         if (genderId == -1) {
-            Toast.makeText(this, "Please choose gender!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Giới tính không được để trống!", Toast.LENGTH_SHORT).show()
             return
         }
-        val gender = if (genderId == R.id.radioMale) "male" else "female"
+        val gender = if (genderId == R.id.radioMale) "Nam" else "Nữ"
 
 
         if (name.isEmpty() || email.isEmpty() || password.isEmpty() || phone.isEmpty() ||
             nationalId.isEmpty() || dobInput.isEmpty() || address.isEmpty()
         ) {
-            Toast.makeText(this, "Please fill all information!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Xin hãy điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Định dạng email không hợp lệ!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if(phone.length != 10) {
+            Toast.makeText(this, "Số điện thoại không đúng!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if(nationalId.length != 12) {
+            Toast.makeText(this, "CCCD/CMND không hợp lệ!", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if(password.length < 6) {
+            Toast.makeText(this, "Mật khẩu phải có ít nhất 6 ký tự!", Toast.LENGTH_SHORT).show()
             return
         }
 
         // DATE → TIMESTAMP
         val dobTimestamp = parseDateToTimestamp(dobInput)
         if (dobTimestamp == null) {
-            Toast.makeText(this, "DOB must be yyyy-MM-dd!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Ngày sinh phải là dd/MM/yyyy!", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -124,37 +161,23 @@ class AddCustomerActivity : AppCompatActivity() {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener { result ->
                 val uid = result.user?.uid ?: return@addOnSuccessListener
-                generateCustomerId { customerId ->
-                    uploadAvatarAndSave(uid, customerId, name, email, phone, nationalId, dobTimestamp, gender, address)
-                }
+
+                uploadAvatarAndSave(uid, name, email, phone, nationalId, dobTimestamp, gender, address)
+
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Create auth failed: ${it.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Tạo thất bại: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    // Convert yyyy-MM-dd → Timestamp
     private fun parseDateToTimestamp(dateStr: String): Timestamp? {
         return try {
-            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             val date = sdf.parse(dateStr)
             Timestamp(date!!)
         } catch (e: Exception) {
             null
         }
-    }
-
-    private fun generateCustomerId(callback: (String) -> Unit) {
-        val counterRef = db.collection("counters").document("customers")
-
-        db.runTransaction { t ->
-            val snap = t.get(counterRef)
-            val current = snap.getLong("currentNumber") ?: 0
-            val next = current + 1
-
-            t.update(counterRef, "currentNumber", next)
-            "CUS%04d".format(next)
-        }.addOnSuccessListener { callback(it) }
     }
 
     private fun showDatePicker() {
@@ -168,10 +191,10 @@ class AddCustomerActivity : AppCompatActivity() {
             this,
             { _, selectedYear, selectedMonth, selectedDay ->
                 val formatted = String.format(
-                    "%04d-%02d-%02d",
-                    selectedYear,
+                    "%02d/%02d/%04d",
+                    selectedDay,
                     selectedMonth + 1,
-                    selectedDay
+                    selectedYear
                 )
                 edtDOB.setText(formatted)
             },
@@ -190,7 +213,6 @@ class AddCustomerActivity : AppCompatActivity() {
 
     private fun uploadAvatarAndSave(
         uid: String,
-        customerId: String,
         name: String,
         email: String,
         phone: String,
@@ -200,32 +222,32 @@ class AddCustomerActivity : AppCompatActivity() {
         address: String
     ) {
         if (imageUri == null) {
-            saveCustomer(uid, customerId, name, email, phone, nationalId, dob, gender, address, "")
+            saveCustomer(uid, name, email, phone, nationalId, dob, gender, address, "")
             return
         }
 
         val storageRef = FirebaseStorage.getInstance()
-            .reference.child("avatars/$customerId.jpg")
+            .reference.child("avatars/$uid.jpg") // ✅ dùng uid
 
         storageRef.putFile(imageUri!!)
             .addOnSuccessListener {
                 storageRef.downloadUrl.addOnSuccessListener { uri ->
                     saveCustomer(
-                        uid, customerId, name, email, phone,
+                        uid, name, email, phone,
                         nationalId, dob, gender, address, uri.toString()
                     )
                 }
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Upload failed: ${it.message}", Toast.LENGTH_SHORT).show()
-                saveCustomer(uid, customerId, name, email, phone, nationalId, dob, gender, address, "")
+                saveCustomer(uid, name, email, phone, nationalId, dob, gender, address, "")
             }
     }
 
 
+
     private fun saveCustomer(
         uid: String,
-        customerId: String,
         name: String,
         email: String,
         phone: String,
@@ -237,7 +259,6 @@ class AddCustomerActivity : AppCompatActivity() {
     ) {
         val data = mapOf(
             "uid" to uid,
-            "customerId" to customerId,
             "name" to name,
             "email" to email,
             "phoneNum" to phone,
@@ -255,7 +276,7 @@ class AddCustomerActivity : AppCompatActivity() {
         db.collection("customers").document(uid)
             .set(data)
             .addOnSuccessListener {
-                Toast.makeText(this, "Customer created successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Tạo khách hàng thành công!", Toast.LENGTH_SHORT).show()
                 finish()
             }
             .addOnFailureListener {

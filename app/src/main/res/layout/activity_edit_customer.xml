@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
@@ -11,110 +12,111 @@
 
         <!-- Toolbar -->
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbarAddCustomer"
+            android:id="@+id/toolbarEditCustomer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
-            android:title="Add Customer"
+            android:title="Chỉnh sửa khách hàng"
             android:titleTextColor="@android:color/white" />
 
         <!-- Section Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Customer Information"
+            android:text="Thông tin khách hàng"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginTop="20dp" />
 
-        <!-- Full Name -->
+        <!-- Họ và tên -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Họ và tên" />
+            android:text="Họ và tên"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
 
         <EditText
             android:id="@+id/edtFullName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập họ và tên khách hàng"/>
+            android:hint="Nhập họ và tên" />
+
 
         <!-- Email -->
         <TextView
-            android:text="Email"
-            android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="Email"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp" />
 
         <EditText
             android:id="@+id/edtEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập email khách hàng"
-            android:inputType="textEmailAddress"/>
+            android:hint="example@gmail.com"
+            android:enabled="false"
+            android:textColor="#888888"
+            android:inputType="textEmailAddress" />
 
-        <!-- Password -->
+
+        <!-- Số điện thoại -->
         <TextView
-            android:text="Mật khẩu"
-            android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <EditText
-            android:id="@+id/edtPassword"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập mật khẩu"
-            android:inputType="textPassword"/>
-
-        <!-- Phone Number -->
-        <TextView
             android:text="Số điện thoại"
-            android:layout_marginTop="12dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:textStyle="bold"
+            android:layout_marginTop="12dp" />
 
         <EditText
             android:id="@+id/edtPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập số điện thoại khách hàng"
-            android:inputType="phone"/>
+            android:hint="0123456789"
+            android:inputType="phone" />
 
-        <!-- National ID -->
+
+        <!-- CMND / CCCD -->
         <TextView
-            android:text="CMND/CCCD"
-            android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="CMND / CCCD"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp" />
 
         <EditText
             android:id="@+id/edtNationalId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập CCCD/CMND khách hàng"
-            android:inputType="number"/>
+            android:hint="Nhập số CMND/CCCD"
+            android:enabled="false"
+            android:textColor="#888888"
+            android:inputType="number" />
 
-        <!-- Address -->
+
+        <!-- Địa chỉ -->
         <TextView
-            android:text="Địa chỉ"
-            android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="Địa chỉ"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp" />
 
         <EditText
             android:id="@+id/edtAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập địa chỉ khách hàng"/>
+            android:hint="Nhập địa chỉ" />
 
-        <!-- Date of Birth -->
+
+        <!-- Ngày sinh -->
         <TextView
-            android:text="Ngày sinh"
-            android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="Ngày sinh"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp" />
 
         <EditText
             android:id="@+id/edtDOB"
@@ -123,50 +125,59 @@
             android:hint="dd/MM/yyyy"
             android:focusable="false"
             android:clickable="true"
-            android:inputType="none"/>
+            android:inputType="none" />
 
-        <!-- eKYC -->
+
+        <!-- Trạng thái eKYC -->
         <TextView
-            android:text="eKYC Status"
-            android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="Trạng thái eKYC"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp" />
 
         <EditText
             android:id="@+id/edtEKYC"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Verified / Pending"/>
+            android:hint="Đã xác minh / Chưa xác minh" />
 
-        <!-- Gender -->
+
+        <!-- Giới tính -->
         <TextView
-            android:text="Giới tính"
-            android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
+            android:layout_height="wrap_content"
+            android:text="Giới tính"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp" />
         <RadioGroup
             android:id="@+id/radioGender"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
 
             <RadioButton
                 android:id="@+id/radioMale"
-                android:text="Nam"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nam" />
 
             <RadioButton
                 android:id="@+id/radioFemale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Nữ"
-                android:layout_marginStart="24dp"/>
+                android:layout_marginStart="24dp" />
         </RadioGroup>
 
         <!-- Avatar -->
         <TextView
-            android:text="Ảnh đại diện"
-            android:layout_marginTop="12dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:text="Ảnh đại diện"
+            android:textSize="16sp"
+            android:layout_marginTop="12dp" />
 
         <ImageView
             android:id="@+id/imgAvatarPreview"
@@ -176,22 +187,22 @@
             android:scaleType="centerCrop"
             android:background="@drawable/circle_bg"
             android:padding="6dp"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp" />
 
         <Button
             android:id="@+id/btnChooseImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chọn ảnh"
-            android:layout_marginTop="8dp"/>
+            android:text="Đổi ảnh"
+            android:layout_marginTop="12dp" />
 
-        <!-- Submit -->
+        <!-- Nút lưu thay đổi -->
         <Button
-            android:id="@+id/btnAddCustomer"
+            android:id="@+id/btnUpdateCustomer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Thêm khách hàng mới"
-            android:layout_marginTop="24dp"/>
+            android:text="Lưu thay đổi"
+            android:layout_marginTop="24dp" />
 
     </LinearLayout>
 

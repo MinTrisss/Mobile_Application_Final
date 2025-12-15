@@ -18,3 +18,5 @@ data class Customer(
     val dateOfBirth: Timestamp? = null,
     val createdAt: Timestamp? = null
 )
+
+

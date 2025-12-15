@@ -73,14 +73,14 @@ class RegisterLoanActivity : AppCompatActivity() {
             Toast.makeText(this, "Không thể xác thực người dùng.", Toast.LENGTH_SHORT).show()
             return
         }
-        val customerId = currentUser.uid
+        val uid = currentUser.uid
 
         val newLoanAccountId = ThreadLocalRandom.current().nextLong(1_000_000_000L, 10_000_000_000L)
         val selectedDuration = spinnerLoanDuration.selectedItem.toString()
 
         val newLoanApplication = hashMapOf(
             "accountId" to newLoanAccountId,
-            "customerId" to customerId,
+            "uid" to uid,
             "type" to "loan",
             "status" to "Chờ duyệt", // Trạng thái chờ duyệt
             "createdAt" to Timestamp.now(),

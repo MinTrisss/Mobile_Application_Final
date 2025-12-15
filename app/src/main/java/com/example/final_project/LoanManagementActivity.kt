@@ -67,10 +67,10 @@ class LoanManagementActivity : AppCompatActivity() {
     }
 
     private fun listenForLoanChanges() {
-        val customerId = auth.currentUser?.uid ?: return
+        val uid = auth.currentUser?.uid ?: return
 
         val query = db.collection("accounts")
-            .whereEqualTo("customerId", customerId)
+            .whereEqualTo("uid", uid)
             .whereEqualTo("type", "loan")
             .orderBy("createdAt", Query.Direction.DESCENDING)
 

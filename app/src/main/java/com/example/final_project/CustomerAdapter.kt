@@ -7,12 +7,14 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import android.util.Log
+
 
 class CustomerAdapter(
     private val list: List<Customer>,
     private val onEdit: (Customer) -> Unit,
     private val onToggleStatus: (Customer) -> Unit,
-    val onItemClick: (Customer) -> Unit,
+    private val onItemClick: (Customer) -> Unit,
 ) : RecyclerView.Adapter<CustomerAdapter.VH>() {
 
     inner class VH(v: View) : RecyclerView.ViewHolder(v) {
@@ -34,13 +36,14 @@ class CustomerAdapter(
         val c = list[position]
 
         h.txtName.text = c.name
-        h.txtMeta.text = "${c.customerId} · ${c.phoneNum}"
-        h.txtStatus.text = "Available: ${c.status}"
+        h.txtMeta.text = "${c.nationalId} · ${c.phoneNum}"
+        h.txtStatus.text = "Trạng thái: ${c.status}"
+        Log.d("DEBUG", "nationalId = ${c.nationalId}")
 
         h.txtStatus.setTextColor(
             when (c.ekycStatus) {
-                "normal" -> Color.parseColor("#2E7D32")
-                "locked" -> Color.parseColor("#F57C00")
+                "Hoạt động" -> Color.parseColor("#2E7D32")
+                "Đã khoá" -> Color.parseColor("#F57C00")
                 else -> Color.GRAY
             }
         )

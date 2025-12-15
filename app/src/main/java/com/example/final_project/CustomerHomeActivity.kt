@@ -84,7 +84,7 @@ class CustomerHomeActivity : AppCompatActivity() {
                 if (snapshots != null && !snapshots.isEmpty) {
                     val doc = snapshots.documents[0]
                     val balance = doc.getDouble("balance") ?: 0.0
-                    val accountId = doc.getLong("accountId") ?: 0
+                    val accountId = doc.getString("accountId") ?: 0
                     txtBalance.text = String.format("%,.0f VNĐ", balance)
                     txtAccountNumber.text = "Số tài khoản: $accountId"
                 } else {

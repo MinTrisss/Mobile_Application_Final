@@ -49,7 +49,7 @@
         android:id="@+id/btnAddCustomer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Create Customer Account"
+        android:text="THÊM KHÁCH HÀNG"
         android:layout_marginTop="16dp" />
 
     <Button
