@@ -33,7 +33,7 @@ class CustomerDetailActivity : AppCompatActivity() {
             setDisplayHomeAsUpEnabled(true)
         }
 
-        val customerId = intent.getStringExtra("customerId")
+        val uid = intent.getStringExtra("uid")
             ?: run {
                 finish()
                 return
@@ -41,7 +41,7 @@ class CustomerDetailActivity : AppCompatActivity() {
 
         FirebaseFirestore.getInstance()
             .collection("customers")
-            .document(customerId)
+            .document(uid)
             .get()
             .addOnSuccessListener { doc ->
                 if (!doc.exists()) return@addOnSuccessListener
