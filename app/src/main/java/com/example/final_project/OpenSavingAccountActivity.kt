@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
 import java.util.concurrent.ThreadLocalRandom
+import android.util.Log
 
 class OpenSavingAccountActivity : AppCompatActivity() {
 
@@ -51,6 +52,8 @@ class OpenSavingAccountActivity : AppCompatActivity() {
 
     private fun initActions() {
         btnOpenSavingAccount.setOnClickListener {
+            Toast.makeText(this, "CLICK OK", Toast.LENGTH_SHORT).show()
+            Log.d("DEBUG", "CLICK OK")
             performSavingTransaction()
         }
     }
@@ -109,7 +112,7 @@ class OpenSavingAccountActivity : AppCompatActivity() {
 
                     val newBalance = currentBalance - savingAmount
                     transaction.update(checkingAccountRef, "balance", newBalance)
-                    transaction.set(db.collection("accounts").document(), newSavingAccount)
+                    transaction.set(db.collection("accounts").document(newSavingAccountId), newSavingAccount)
 
                     null
                 }.addOnSuccessListener {

@@ -26,6 +26,9 @@ class CustomerHomeActivity : AppCompatActivity() {
     private var customerListener: ListenerRegistration? = null
     private var accountListener: ListenerRegistration? = null
 
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -84,7 +87,7 @@ class CustomerHomeActivity : AppCompatActivity() {
                 if (snapshots != null && !snapshots.isEmpty) {
                     val doc = snapshots.documents[0]
                     val balance = doc.getDouble("balance") ?: 0.0
-                    val accountId = doc.getLong("accountId") ?: 0
+                    val accountId = doc.getString("accountId") ?: ""
                     txtBalance.text = String.format("%,.0f VNĐ", balance)
                     txtAccountNumber.text = "Số tài khoản: $accountId"
                 } else {
@@ -95,7 +98,15 @@ class CustomerHomeActivity : AppCompatActivity() {
     }
 
     private fun initActions() {
-        findViewById<ImageView>(R.id.btnLogoutCustomer).setOnClickListener {
+        val btnLogOut = findViewById<ImageView>(R.id.btnLogoutCustomer)
+        val btnInternalTransfer = findViewById<View>(R.id.btnInternalTransfer)
+        val btnTransactionHistory = findViewById<View>(R.id.btnTransactionHistory)
+        val btnAccountManagement = findViewById<View>(R.id.btnAccountManagement)
+        val btnUtilitiesElectric = findViewById<View>(R.id.btnUtilitiesElectric)
+        val btnUtilitiesWater = findViewById<View>(R.id.btnUtilitiesWater)
+
+
+        btnLogOut.setOnClickListener {
             auth.signOut()
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -103,16 +114,22 @@ class CustomerHomeActivity : AppCompatActivity() {
             finish()
         }
 
-        findViewById<View>(R.id.btnInternalTransfer).setOnClickListener {
+        btnInternalTransfer.setOnClickListener {
              startActivity(Intent(this, TransferActivity::class.java))
         }
 
-        findViewById<View>(R.id.btnTransactionHistory).setOnClickListener {
+        btnTransactionHistory.setOnClickListener {
             startActivity(Intent(this, TransactionHistoryActivity::class.java))
         }
 
-        findViewById<View>(R.id.btnAccountManagement).setOnClickListener {
+        btnAccountManagement.setOnClickListener {
             startActivity(Intent(this, AccountManagementActivity::class.java))
+        }
+        btnUtilitiesElectric.setOnClickListener {
+            startActivity(Intent(this, ElectricityPaymentActivity::class.java))
+        }
+        btnUtilitiesWater.setOnClickListener {
+            startActivity(Intent(this, WaterPaymentActivity::class.java))
         }
     }
 }

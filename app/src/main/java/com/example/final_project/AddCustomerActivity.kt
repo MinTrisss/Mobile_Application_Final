@@ -244,8 +244,6 @@ class AddCustomerActivity : AppCompatActivity() {
             }
     }
 
-
-
     private fun saveCustomer(
         uid: String,
         name: String,
@@ -276,6 +274,7 @@ class AddCustomerActivity : AppCompatActivity() {
         db.collection("customers").document(uid)
             .set(data)
             .addOnSuccessListener {
+                createCheckingAccount(uid)
                 Toast.makeText(this, "Tạo khách hàng thành công!", Toast.LENGTH_SHORT).show()
                 finish()
             }
@@ -283,4 +282,39 @@ class AddCustomerActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
+    private fun generateAccountId(): String {
+        val random = Random()
+        val sb = StringBuilder()
+        for (i in 1..10) {
+            sb.append(random.nextInt(10))
+        }
+        return sb.toString()
+    }
+
+
+    private fun createCheckingAccount(uid: String) {
+
+        val accountId = generateAccountId()
+
+        val accountData = mapOf(
+            "accountId" to accountId,
+            "uid" to uid,
+            "type" to "checking",
+            "balance" to 10000, // hoặc số khởi tạo
+            "createdAt" to FieldValue.serverTimestamp()
+        )
+
+        db.collection("accounts")
+            .document(accountId)
+            .set(accountData)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Tạo khách hàng & tài khoản thành công!", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Tạo account thất bại!", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 }
