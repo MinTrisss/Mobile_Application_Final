@@ -78,6 +78,64 @@
                 android:textStyle="bold"
                 android:textColor="#0FA958"
                 android:layout_marginTop="4dp" />
+
+            <!-- MONTHLY INTEREST -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lãi mỗi tháng (ước tính)"
+                android:textSize="14sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/tvMonthlyInterest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 VNĐ / tháng"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1F2937"
+                android:layout_marginTop="4dp" />
+
+            <!-- TOTAL INTEREST -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tổng lãi sau kỳ hạn"
+                android:textSize="14sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/tvTotalInterest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 VNĐ"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1F2937"
+                android:layout_marginTop="4dp" />
+
+            <!-- TOTAL AT MATURITY -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tổng tiền nhận khi đáo hạn"
+                android:textSize="14sp"
+                android:textColor="#6B7280"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/tvTotalAtMaturity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 VNĐ"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#0FA958"
+                android:layout_marginTop="4dp" />
+
         </LinearLayout>
 
         <!-- OPEN BUTTON -->

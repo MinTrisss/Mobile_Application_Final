@@ -4,12 +4,16 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseAuth
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.widget.ImageView
 import android.widget.TextView
+import android.content.Intent
+import android.view.View
+import android.widget.Button
 import androidx.appcompat.widget.Toolbar
 import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
@@ -59,6 +63,7 @@ class CustomerDetailActivity : AppCompatActivity() {
             .into(findViewById(R.id.imgAvatarDetail))
 
         findViewById<TextView>(R.id.txtCustomerName).text = "Họ và tên: ${customer.name}"
+        findViewById<TextView>(R.id.txtNationalId).text = "CCCD/CMND: ${customer.nationalId}"
         findViewById<TextView>(R.id.txtPhoneDetail).text = "Số điện thoại: ${customer.phoneNum}"
         findViewById<TextView>(R.id.txtEmailDetail).text = "Email: ${customer.email}"
         findViewById<TextView>(R.id.txtAddressDetail).text = "Địa chỉ: ${customer.address}"
@@ -68,6 +73,31 @@ class CustomerDetailActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.txtCreatedAtDetail).text =
             "Tạo vào: ${formatTimestamp(customer.createdAt)}"
         findViewById<TextView>(R.id.txtGender).text = "Giới tính: ${customer.gender}"
+
+        val btnEdit = findViewById<Button>(R.id.btnEditCustomer)
+
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (currentUid != null) {
+            FirebaseFirestore.getInstance()
+                .collection("employees")
+                .document(currentUid)
+                .get()
+                .addOnSuccessListener { userDoc ->
+                    val role = userDoc.getString("role")
+
+                    if (role == "employee") {
+                        btnEdit.visibility = View.GONE
+                    }
+                }
+        }
+
+        btnEdit.setOnClickListener {
+            val intent = Intent(this, EditCustomerActivity::class.java)
+            intent.putExtra("uid", customer.uid)
+            startActivity(intent)
+        }
+
 
         val avtURL = findViewById<ImageView>(R.id.imgAvatarDetail)
         Glide.with(this).load(customer.avtURL).into(avtURL)

@@ -130,10 +130,34 @@ class TransactionAdapter(private val transactions: List<TransactionModel>)
         holder.amount.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.holo_red_dark))
 
         when(transaction.type) {
-            "internal_transfer" -> {
-                holder.type.text = "Chuyển đến TK ${transaction.toAccountId}"
+            "deposit" -> {
+                holder.type.text = "Nạp tiền"
+                holder.amount.text = "+ ${String.format("%,.0f", transaction.amount)} VNĐ"
+                holder.amount.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.holo_red_dark))
                 holder.icon.setImageResource(R.drawable.ic_deposit)
             }
+
+            "withdraw" -> {
+                holder.type.text = "Rút tiền"
+                holder.amount.text = "- ${String.format("%,.0f", transaction.amount)} VNĐ"
+                holder.amount.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.holo_red_dark))
+                holder.icon.setImageResource(R.drawable.ic_deposit)
+            }
+
+            "internal_transfer_out" -> {
+                holder.type.text = "Chuyển đến TK ${transaction.toAccountId}"
+                holder.amount.text = "- ${String.format("%,.0f", transaction.amount)} VNĐ"
+                holder.amount.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.holo_red_dark))
+                holder.icon.setImageResource(R.drawable.ic_transfer)
+            }
+
+            "internal_transfer_in" -> {
+                holder.type.text = "Nhận tiền từ TK ${transaction.fromAccountId}"
+                holder.amount.text = "+ ${String.format("%,.0f", transaction.amount)} VNĐ"
+                holder.amount.setTextColor(ContextCompat.getColor(holder.itemView.context, android.R.color.holo_green_dark))
+                holder.icon.setImageResource(R.drawable.ic_deposit)
+            }
+
             "electricity" -> {
                 holder.type.text = "Thanh toán tiền điện"
                 holder.icon.setImageResource(R.drawable.ic_electricity)

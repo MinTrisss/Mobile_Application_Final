@@ -130,6 +130,23 @@
                     android:textColor="#0FA958"
                     android:textSize="22sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Số tiền nhận sau kỳ hạn"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvTotalAtMaturity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="... VNĐ"
+                    android:textColor="#0FA958"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
                 
                 <Button
                     android:id="@+id/btnSettleSaving"

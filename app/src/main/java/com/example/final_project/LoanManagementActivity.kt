@@ -20,7 +20,7 @@ import com.google.firebase.firestore.Query
 import java.text.SimpleDateFormat
 import java.util.*
 
-data class Loan(val id: String, val accountId: Long, val amount: Double, val duration: String, val status: String, val createdAt: Date)
+data class Loan(val id: String, val uid: String, val amount: Double, val duration: String, val status: String, val createdAt: Date)
 
 class LoanManagementActivity : AppCompatActivity() {
 
@@ -84,7 +84,7 @@ class LoanManagementActivity : AppCompatActivity() {
             for (doc in snapshots!!) {
                 val loan = Loan(
                     id = doc.id,
-                    accountId = doc.getLong("accountId") ?: 0,
+                    uid = doc.getString("uid") ?: "",
                     amount = doc.getDouble("loan") ?: 0.0,
                     duration = doc.getString("duration") ?: "N/A",
                     status = doc.getString("status") ?: "N/A",
@@ -127,7 +127,7 @@ class LoanAdapter(private val loans: List<Loan>) : RecyclerView.Adapter<LoanAdap
         val loan = loans[position]
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
-        holder.tvLoanId.text = "Mã khoản vay: #${loan.accountId}"
+        holder.tvLoanId.text = "Mã khoản vay: #${loan.uid}"
         holder.tvLoanStatus.text = loan.status
         holder.tvLoanAmount.text = "Số tiền vay: ${String.format("%,.0f", loan.amount)} VNĐ"
         holder.tvLoanDuration.text = "Kỳ hạn: ${loan.duration}"

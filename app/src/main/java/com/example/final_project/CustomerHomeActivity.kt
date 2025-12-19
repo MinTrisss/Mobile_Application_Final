@@ -104,6 +104,24 @@ class CustomerHomeActivity : AppCompatActivity() {
         val btnAccountManagement = findViewById<View>(R.id.btnAccountManagement)
         val btnUtilitiesElectric = findViewById<View>(R.id.btnUtilitiesElectric)
         val btnUtilitiesWater = findViewById<View>(R.id.btnUtilitiesWater)
+        val avt = findViewById<ImageView>(R.id.imgAvatar)
+
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
+        val uid = currentUser.uid
+
+
+        avt.setOnClickListener {
+            Toast.makeText(this, "Đã click ImageView", Toast.LENGTH_SHORT).show()
+
+            val intent = Intent(this, CustomerDetailActivity::class.java)
+            intent.putExtra("uid", uid)
+            startActivity(intent)
+        }
 
 
         btnLogOut.setOnClickListener {

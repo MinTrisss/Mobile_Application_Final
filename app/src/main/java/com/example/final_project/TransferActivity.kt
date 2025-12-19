@@ -19,6 +19,7 @@ class TransferActivity : AppCompatActivity() {
     private lateinit var edtReceiverAccountNumber: EditText
     private lateinit var btnCheckReceiver: Button
     private lateinit var tvReceiverName: TextView
+    private lateinit var tvBalance: TextView
     private lateinit var edtTransferAmount: EditText
     private lateinit var edtTransferContent: EditText
     private lateinit var btnConfirmTransfer: Button
@@ -40,6 +41,8 @@ class TransferActivity : AppCompatActivity() {
 
         initViews()
         initActions()
+        loadSenderBalance()
+
     }
 
     private fun initViews() {
@@ -49,11 +52,33 @@ class TransferActivity : AppCompatActivity() {
         edtTransferAmount = findViewById(R.id.edtTransferAmount)
         edtTransferContent = findViewById(R.id.edtTransferContent)
         btnConfirmTransfer = findViewById(R.id.btnConfirmTransfer)
+        tvBalance = findViewById(R.id.tvBalance)
     }
 
     private fun initActions() {
         btnCheckReceiver.setOnClickListener { checkReceiver() }
         btnConfirmTransfer.setOnClickListener { performTransfer() }
+    }
+
+    private fun loadSenderBalance() {
+        val uid = auth.currentUser?.uid ?: return
+
+        db.collection("accounts")
+            .whereEqualTo("uid", uid)
+            .whereEqualTo("type", "checking")
+            .limit(1)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (!snapshot.isEmpty) {
+                    val balance = snapshot.documents[0].getDouble("balance") ?: 0.0
+                    tvBalance.text = "${String.format("%,.0f", balance)} VNĐ"
+                } else {
+                    tvBalance.text = "0 VNĐ"
+                }
+            }
+            .addOnFailureListener {
+                tvBalance.text = "Số dư: --"
+            }
     }
 
     private fun checkReceiver() {
@@ -62,11 +87,12 @@ class TransferActivity : AppCompatActivity() {
             Toast.makeText(this, "Vui lòng nhập số tài khoản người nhận", Toast.LENGTH_SHORT).show()
             return
         }
-        val receiverAccountId = receiverAccountIdString.toLongOrNull()
-        if (receiverAccountId == null) {
+        val receiverAccountId = receiverAccountIdString.trim()
+        if (receiverAccountId.isEmpty()) {
             Toast.makeText(this, "Số tài khoản không hợp lệ", Toast.LENGTH_SHORT).show()
             return
         }
+
 
         // Find the receiver's checking account
         db.collection("accounts")
@@ -154,33 +180,55 @@ class TransferActivity : AppCompatActivity() {
 
                 // Run the transaction
                 db.runTransaction { transaction ->
+
                     val senderSnap = transaction.get(senderAccountRef)
                     val receiverSnap = transaction.get(receiverAccountRef!!)
 
                     val senderBalance = senderSnap.getDouble("balance") ?: 0.0
                     if (senderBalance < transferAmount) {
-                        throw Exception("Số dư không đủ để thực hiện giao dịch.")
+                        throw Exception("Số dư không đủ.")
                     }
 
-                    val fromAccountId = senderSnap.getLong("accountId")?.toString() ?: ""
-                    val toAccountId = receiverSnap.getLong("accountId")?.toString() ?: ""
+                    val receiverBalance = receiverSnap.getDouble("balance") ?: 0.0
 
+                    val fromAccountId = senderSnap.getString("accountId")!!
+                    val toAccountId = receiverSnap.getString("accountId")!!
+                    val receiverUid = receiverSnap.getString("uid")!!
+
+                    // 1️⃣ UPDATE BALANCE
                     transaction.update(senderAccountRef, "balance", senderBalance - transferAmount)
-                    transaction.update(receiverAccountRef!!, "balance", receiverSnap.getDouble("balance")!! + transferAmount)
+                    transaction.update(receiverAccountRef!!, "balance", receiverBalance + transferAmount)
 
-                    val transactionId = "T${System.currentTimeMillis()}"
-                    val transactionRecord = hashMapOf(
-                        "transactionId" to transactionId,
+                    val time = Timestamp.now()
+
+                    // 2️⃣ TRANSACTION – NGƯỜI GỬI (TRỪ TIỀN)
+                    val senderTransaction = hashMapOf(
+                        "transactionId" to "T${System.currentTimeMillis()}_OUT",
                         "uid" to senderId,
                         "fromAccountId" to fromAccountId,
                         "toAccountId" to toAccountId,
                         "amount" to transferAmount,
                         "note" to content,
                         "status" to "Thành công",
-                        "timestamp" to Timestamp.now(),
-                        "type" to "internal_transfer"
+                        "timestamp" to time,
+                        "type" to "internal_transfer_out"
                     )
-                    transaction.set(db.collection("transactions").document(), transactionRecord)
+
+                    // 3️⃣ TRANSACTION – NGƯỜI NHẬN (CỘNG TIỀN)
+                    val receiverTransaction = hashMapOf(
+                        "transactionId" to "T${System.currentTimeMillis()}_IN",
+                        "uid" to receiverUid,
+                        "fromAccountId" to fromAccountId,
+                        "toAccountId" to toAccountId,
+                        "amount" to transferAmount,
+                        "note" to content,
+                        "status" to "Thành công",
+                        "timestamp" to time,
+                        "type" to "internal_transfer_in"
+                    )
+
+                    transaction.set(db.collection("transactions").document(), senderTransaction)
+                    transaction.set(db.collection("transactions").document(), receiverTransaction)
 
                     null
                 }.addOnSuccessListener {

@@ -66,6 +66,13 @@
         android:text="Verify Customer eKYC"
         android:layout_marginTop="8dp" />
 
+    <Button
+        android:id="@+id/btnWithdrawDeposit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nạp tiền/Rút tiền"
+        android:layout_marginTop="8dp" />
+
     <!-- ===== SEARCH & SORT ===== -->
     <LinearLayout
         android:id="@+id/layoutSearchSort"

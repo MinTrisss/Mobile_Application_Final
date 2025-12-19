@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chuyển khoản"
+            android:text="Rút/Nạp tiền"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#1F2937"
@@ -70,7 +70,7 @@
                 android:hint="Nhập số tài khoản người nhận"
                 android:inputType="number"
                 android:layout_marginTop="6dp" />
-                
+
             <Button
                 android:id="@+id/btnCheckReceiver"
                 style="@style/Widget.AppCompat.Button.Small"
@@ -87,7 +87,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Nguyễn Văn A"
                 android:textStyle="bold"
-                android:visibility="gone" 
+                android:visibility="gone"
                 android:textSize="25dp"
                 android:textColor="#0FA958"
                 tools:visibility="visible" />
@@ -109,34 +109,41 @@
                 android:inputType="number"
                 android:layout_marginTop="6dp" />
 
-            <!-- CONTENT -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Nội dung chuyển khoản"
-                android:textSize="14sp"
-                android:textColor="#6B7280"
-                android:layout_marginTop="16dp" />
-
-            <EditText
-                android:id="@+id/edtTransferContent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Ví dụ: Chuyển tiền mua đồ"
-                android:layout_marginTop="6dp" />
-
         </LinearLayout>
 
         <!-- CONFIRM BUTTON -->
-        <Button
-            android:id="@+id/btnConfirmTransfer"
+        <!-- ACTION BUTTONS -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:backgroundTint="#0FA958"
-            android:radius="16dp"
-            android:text="Xác nhận chuyển khoản"
-            android:textColor="@android:color/white" />
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <!-- WITHDRAW BUTTON -->
+            <Button
+                android:id="@+id/btnWithdraw"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="#0FA958"
+                android:text="Rút tiền"
+                android:textColor="@android:color/white" />
+
+            <!-- TRANSFER BUTTON -->
+            <Button
+                android:id="@+id/btnDeposit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="#0FA958"
+                android:text="Nạp tiền"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 </ScrollView>

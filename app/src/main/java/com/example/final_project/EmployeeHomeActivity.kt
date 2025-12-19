@@ -45,6 +45,7 @@ class EmployeeHomeActivity : AppCompatActivity() {
 
         val btnAddCustomer = findViewById<Button>(R.id.btnAddCustomer)
         val btnLogout = findViewById<ImageView>(R.id.btnLogoutEmployee)
+        val btnWithdrawActivity = findViewById<Button>(R.id.btnWithdrawDeposit)
         val txtOfficerTitle = findViewById<TextView>(R.id.txtOfficerTitle)
         val uid = FirebaseAuth.getInstance().currentUser?.uid
 
@@ -122,6 +123,11 @@ class EmployeeHomeActivity : AppCompatActivity() {
         btnAddCustomer.setOnClickListener {
             startActivity(Intent(this, AddCustomerActivity::class.java))
         }
+
+        btnWithdrawActivity.setOnClickListener {
+            startActivity(Intent(this, DepositWithdrawActivity::class.java))
+        }
+
 
         btnLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()

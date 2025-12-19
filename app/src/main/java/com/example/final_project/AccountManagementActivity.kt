@@ -29,6 +29,7 @@ class AccountManagementActivity : AppCompatActivity() {
     private lateinit var tvSavingAccountNumber: TextView
     private lateinit var tvSavingTerm: TextView
     private lateinit var tvSavingBalance: TextView
+    private lateinit var tvTotalAtMaturity: TextView
     private lateinit var tvSavingAccountStatus: TextView
     private lateinit var btnOpenSaving: Button
     private lateinit var btnSettleSaving: Button
@@ -69,6 +70,8 @@ class AccountManagementActivity : AppCompatActivity() {
         tvAccountHolder = findViewById(R.id.tvAccountHolder)
         tvOpenDate = findViewById(R.id.tvOpenDate)
         tvCheckingBalance = findViewById(R.id.tvCheckingBalance)
+        tvTotalAtMaturity = findViewById(R.id.tvTotalAtMaturity)
+
 
         layoutSavingDetails = findViewById(R.id.layoutSavingDetails)
         tvSavingAccountNumber = findViewById(R.id.tvSavingAccountNumber)
@@ -109,8 +112,9 @@ class AccountManagementActivity : AppCompatActivity() {
                             foundSaving = true
                             savingAccountDocId = document.id
                             tvSavingAccountNumber.text = "Số tài khoản: $accountId"
-                            tvSavingTerm.text = "Kỳ hạn: ${document.getString("Term")}"
-                            tvSavingBalance.text = String.format("%,.0f VNĐ", document.getDouble("saving"))
+                            tvSavingTerm.text = "Kỳ hạn: ${document.getString("term")}"
+                            tvSavingBalance.text = String.format("%,.0f VNĐ", document.getDouble("principal"))
+                            tvTotalAtMaturity.text = String.format("%,.0f VNĐ", document.getDouble("totalAtMaturity"))
 
                             layoutSavingDetails.visibility = View.VISIBLE
                             tvSavingAccountStatus.visibility = View.GONE

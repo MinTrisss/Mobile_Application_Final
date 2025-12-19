@@ -130,7 +130,6 @@ class EditCustomerActivity : AppCompatActivity() {
             }
     }
 
-
     private fun loadCustomerData() {
         db.collection("customers")
             .document(intent.getStringExtra("uid") ?: "")
