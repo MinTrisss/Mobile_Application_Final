@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -25,9 +24,6 @@ class CustomerHomeActivity : AppCompatActivity() {
     private val db = FirebaseFirestore.getInstance()
     private var customerListener: ListenerRegistration? = null
     private var accountListener: ListenerRegistration? = null
-
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,33 +94,7 @@ class CustomerHomeActivity : AppCompatActivity() {
     }
 
     private fun initActions() {
-        val btnLogOut = findViewById<ImageView>(R.id.btnLogoutCustomer)
-        val btnInternalTransfer = findViewById<View>(R.id.btnInternalTransfer)
-        val btnTransactionHistory = findViewById<View>(R.id.btnTransactionHistory)
-        val btnAccountManagement = findViewById<View>(R.id.btnAccountManagement)
-        val btnUtilitiesElectric = findViewById<View>(R.id.btnUtilitiesElectric)
-        val btnUtilitiesWater = findViewById<View>(R.id.btnUtilitiesWater)
-        val avt = findViewById<ImageView>(R.id.imgAvatar)
-
-        val currentUser = auth.currentUser
-        if (currentUser == null) {
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-            return
-        }
-        val uid = currentUser.uid
-
-
-        avt.setOnClickListener {
-            Toast.makeText(this, "Đã click ImageView", Toast.LENGTH_SHORT).show()
-
-            val intent = Intent(this, CustomerDetailActivity::class.java)
-            intent.putExtra("uid", uid)
-            startActivity(intent)
-        }
-
-
-        btnLogOut.setOnClickListener {
+        findViewById<ImageView>(R.id.btnLogoutCustomer).setOnClickListener {
             auth.signOut()
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -132,22 +102,47 @@ class CustomerHomeActivity : AppCompatActivity() {
             finish()
         }
 
-        btnInternalTransfer.setOnClickListener {
+        findViewById<View>(R.id.btnInternalTransfer).setOnClickListener {
              startActivity(Intent(this, TransferActivity::class.java))
         }
 
-        btnTransactionHistory.setOnClickListener {
+        findViewById<View>(R.id.btnTransactionHistory).setOnClickListener {
             startActivity(Intent(this, TransactionHistoryActivity::class.java))
         }
 
-        btnAccountManagement.setOnClickListener {
+        findViewById<View>(R.id.btnAccountManagement).setOnClickListener {
             startActivity(Intent(this, AccountManagementActivity::class.java))
         }
-        btnUtilitiesElectric.setOnClickListener {
-            startActivity(Intent(this, ElectricityPaymentActivity::class.java))
+
+        findViewById<View>(R.id.btnUtilitiesElectric).setOnClickListener {
+            openProviderSelection("Điện")
         }
-        btnUtilitiesWater.setOnClickListener {
-            startActivity(Intent(this, WaterPaymentActivity::class.java))
+
+        findViewById<View>(R.id.btnUtilitiesWater).setOnClickListener {
+            openProviderSelection("Nước")
         }
+
+        findViewById<View>(R.id.btnUtilitiesTicket).setOnClickListener {
+            startActivity(Intent(this, MovieTicketPaymentActivity::class.java))
+        }
+
+        findViewById<View>(R.id.btnUtilitiesPhone).setOnClickListener {
+             openProviderSelection("Nạp tiền")
+        }
+
+        findViewById<View>(R.id.btnBranchLocator).setOnClickListener {
+            startActivity(Intent(this, BranchLocatorActivity::class.java))
+        }
+
+        findViewById<View>(R.id.imgAvatar).setOnClickListener {
+            startActivity(Intent(this, CustomerDetailActivity::class.java))
+        }
+
+    }
+
+    private fun openProviderSelection(serviceType: String) {
+        val intent = Intent(this, ProviderSelectionActivity::class.java)
+        intent.putExtra("serviceType", serviceType)
+        startActivity(intent)
     }
 }
