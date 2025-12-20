@@ -3,8 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:node="replace" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="replace" />
-    
+
     <!-- Quyền truy cập vị trí -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -18,20 +21,24 @@
         android:roundIcon="@drawable/ic_transfer"
         android:supportsRtl="true"
         android:theme="@style/Theme.Final_project">
-
-        <!-- Cấu hình Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBW8XgQMXDNLA87szGFJHcsKyh3ZvyHVx0" />
-
+        <activity
+            android:name=".DepositWithdrawActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditCustomerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CustomerDetailActivity"
+            android:exported="false" />
         <activity
             android:name=".AddCustomerActivity"
             android:exported="false" />
         <activity
             android:name=".EmployeeHomeActivity"
-            android:exported="false" />
-
-        <!-- CUSTOMER -->
+            android:exported="false" /> <!-- CUSTOMER -->
         <activity
             android:name=".CustomerHomeActivity"
             android:exported="false" />
@@ -51,36 +58,33 @@
             android:name=".RegisterLoanActivity"
             android:exported="false" />
         <activity
-            android:name=".LoanManagementActivity" 
+            android:name=".LoanManagementActivity"
             android:exported="false" />
         <activity
-            android:name=".ElectricityPaymentActivity" 
+            android:name=".ElectricityPaymentActivity"
             android:exported="false" />
         <activity
-            android:name=".WaterPaymentActivity" 
+            android:name=".WaterPaymentActivity"
             android:exported="false" />
         <activity
-            android:name=".MovieTicketPaymentActivity" 
+            android:name=".MovieTicketPaymentActivity"
             android:exported="false" />
         <activity
-            android:name=".PhoneTopUpActivity" 
+            android:name=".PhoneTopUpActivity"
             android:exported="false" />
         <activity
             android:name=".ProviderSelectionActivity"
             android:exported="false" />
         <activity
-            android:name=".TicketDetailsActivity" 
+            android:name=".TicketDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".VnPayGatewayActivity" 
+            android:name=".VnPayGatewayActivity"
             android:exported="false" />
-        
-        <!-- Màn hình bản đồ mới -->
         <activity
             android:name=".BranchLocatorActivity"
             android:exported="false"
             android:label="Tìm chi nhánh gần nhất"/>
-
         <activity
             android:name=".LoginActivity"
             android:exported="true"

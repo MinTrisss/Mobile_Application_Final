@@ -56,7 +56,7 @@
         android:id="@+id/btnAdjustRate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Adjust Saving Rates"
+        android:text="Điều chỉnh lãi suất"
         android:layout_marginTop="8dp" />
 
     <Button

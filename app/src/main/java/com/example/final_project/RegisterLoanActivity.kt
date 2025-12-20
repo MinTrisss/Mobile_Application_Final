@@ -21,6 +21,7 @@ class RegisterLoanActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
+    private var interestRates: Map<String, Double> = emptyMap()
 
     private val MINIMUM_LOAN_AMOUNT = 5_000_000.0
 
@@ -33,6 +34,7 @@ class RegisterLoanActivity : AppCompatActivity() {
 
         initViews()
         setupSpinner()
+        loadInterestRates()
         initActions()
     }
 
@@ -49,11 +51,45 @@ class RegisterLoanActivity : AppCompatActivity() {
         spinnerLoanDuration.adapter = adapter
     }
 
+    private fun getDurationMonths(duration: String): Int {
+        return when (duration) {
+            "1 năm" -> 12
+            "2 năm" -> 24
+            "3 năm" -> 36
+            "5 năm" -> 60
+            else -> 0
+        }
+    }
+
+
     private fun initActions() {
         btnRegisterLoanConfirm.setOnClickListener {
             submitLoanApplication()
         }
     }
+
+    private fun loadInterestRates() {
+        btnRegisterLoanConfirm.isEnabled = false
+
+        db.collection("interest_rates")
+            .document("loan")
+            .get()
+            .addOnSuccessListener { doc ->
+                interestRates = doc.data
+                    ?.filterValues { it is Double }
+                    ?.mapValues { it.value as Double }
+                    ?: emptyMap()
+
+                if (interestRates.isNotEmpty()) {
+                    btnRegisterLoanConfirm.isEnabled = true
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Không tải được lãi suất", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
 
     private fun submitLoanApplication() {
         val amountString = edtLoanAmount.text.toString()
@@ -77,16 +113,41 @@ class RegisterLoanActivity : AppCompatActivity() {
 
         val newLoanAccountId = ThreadLocalRandom.current().nextLong(1_000_000_000L, 10_000_000_000L).toString() // Chuyển sang String
         val selectedDuration = spinnerLoanDuration.selectedItem.toString()
+        val durationMonths = getDurationMonths(selectedDuration)
+        val interestRate = interestRates[selectedDuration]
+        if (interestRate == null || interestRate <= 0) {
+            Toast.makeText(this, "Không tìm thấy lãi suất cho kỳ hạn $selectedDuration", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val monthlyPayment = calculatePeriodicPayment(
+            principal = loanAmount,
+            annualRate = interestRate,
+            termMonths = durationMonths,
+            frequency = PaymentFrequency.MONTHLY
+        )
+
+        val totalPayment = monthlyPayment * durationMonths
+        val totalInterest = totalPayment - loanAmount
+
 
         val newLoanApplication = hashMapOf(
             "accountId" to newLoanAccountId,
             "uid" to uid,
             "type" to "loan",
-            "status" to "Chờ duyệt",
-            "createdAt" to Timestamp.now(),
-            "duration" to selectedDuration,
-            "loan" to loanAmount
+
+            "principal" to loanAmount,
+            "interestRate" to interestRate,
+            "termMonths" to durationMonths,
+
+            "monthlyPayment" to monthlyPayment,
+            "totalPayment" to totalPayment,
+            "totalInterest" to totalInterest,
+
+            "status" to "PENDING",
+            "createdAt" to Timestamp.now()
         )
+
 
         db.collection("accounts")
             .add(newLoanApplication)
