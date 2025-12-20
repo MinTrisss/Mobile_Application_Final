@@ -17,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Final_project">
         <activity
+            android:name=".EditInterestRateActivity"
+            android:exported="false" />
+        <activity
             android:name=".DepositWithdrawActivity"
             android:exported="false" />
         <activity

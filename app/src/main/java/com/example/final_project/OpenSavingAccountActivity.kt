@@ -30,7 +30,7 @@ class OpenSavingAccountActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
-
+    private var interestRates: Map<String, Double> = emptyMap()
     private val MINIMUM_SAVING_AMOUNT = 1_000_000.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,13 +82,7 @@ class OpenSavingAccountActivity : AppCompatActivity() {
     }
 
     private fun getInterestRate(term: String): Double {
-        return when (term) {
-            "6 tháng" -> 0.065
-            "1 năm" -> 0.07
-            "2 năm" -> 0.075
-            "3 năm" -> 0.08
-            else -> 0.06
-        }
+        return interestRates[term] ?: 0.06
     }
 
     private fun performSavingTransaction() {

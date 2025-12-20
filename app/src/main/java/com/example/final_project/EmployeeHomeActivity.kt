@@ -44,6 +44,7 @@ class EmployeeHomeActivity : AppCompatActivity() {
         }
 
         val btnAddCustomer = findViewById<Button>(R.id.btnAddCustomer)
+        val btnAdjustRate = findViewById<Button>(R.id.btnAdjustRate)
         val btnLogout = findViewById<ImageView>(R.id.btnLogoutEmployee)
         val btnWithdrawActivity = findViewById<Button>(R.id.btnWithdrawDeposit)
         val txtOfficerTitle = findViewById<TextView>(R.id.txtOfficerTitle)
@@ -126,6 +127,9 @@ class EmployeeHomeActivity : AppCompatActivity() {
 
         btnWithdrawActivity.setOnClickListener {
             startActivity(Intent(this, DepositWithdrawActivity::class.java))
+        }
+        btnAdjustRate.setOnClickListener {
+            startActivity(Intent(this, EditInterestRateActivity::class.java))
         }
 
 
