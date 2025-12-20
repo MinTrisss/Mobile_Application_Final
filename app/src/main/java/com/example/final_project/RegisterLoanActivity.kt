@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -18,6 +19,7 @@ class RegisterLoanActivity : AppCompatActivity() {
     private lateinit var edtLoanAmount: EditText
     private lateinit var spinnerLoanDuration: Spinner
     private lateinit var btnRegisterLoanConfirm: Button
+    private lateinit var tvLoanInterest: TextView
 
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
@@ -42,6 +44,7 @@ class RegisterLoanActivity : AppCompatActivity() {
         edtLoanAmount = findViewById(R.id.edtLoanAmount)
         spinnerLoanDuration = findViewById(R.id.spinnerLoanDuration)
         btnRegisterLoanConfirm = findViewById(R.id.btnRegisterLoanConfirm)
+        tvLoanInterest = findViewById(R.id.tvLoanInterest)
     }
 
     private fun setupSpinner() {
@@ -49,7 +52,23 @@ class RegisterLoanActivity : AppCompatActivity() {
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, durations)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerLoanDuration.adapter = adapter
+
+        spinnerLoanDuration.onItemSelectedListener =
+            object : android.widget.AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: android.widget.AdapterView<*>?,
+                    view: android.view.View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    val selectedDuration = durations[position]
+                    showInterestRate(selectedDuration)
+                }
+
+                override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+            }
     }
+
 
     private fun getDurationMonths(duration: String): Int {
         return when (duration) {
@@ -82,14 +101,14 @@ class RegisterLoanActivity : AppCompatActivity() {
 
                 if (interestRates.isNotEmpty()) {
                     btnRegisterLoanConfirm.isEnabled = true
+                    val selectedDuration = spinnerLoanDuration.selectedItem.toString()
+                    showInterestRate(selectedDuration)
                 }
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Không tải được lãi suất", Toast.LENGTH_SHORT).show()
             }
     }
-
-
 
     private fun submitLoanApplication() {
         val amountString = edtLoanAmount.text.toString()
@@ -160,6 +179,17 @@ class RegisterLoanActivity : AppCompatActivity() {
                 Toast.makeText(this, "Gửi đơn đăng ký thất bại: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
+    private fun showInterestRate(duration: String) {
+        val rate = interestRates[duration]
+
+        if (rate != null) {
+            tvLoanInterest.text = "Lãi suất: ${(rate * 100).toInt()}% / năm"
+        } else {
+            tvLoanInterest.text = "Lãi suất: --"
+        }
+    }
+
 
     override fun onSupportNavigateUp(): Boolean {
         finish()
