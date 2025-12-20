@@ -1,6 +1,7 @@
 package com.example.final_project
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -8,14 +9,16 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class TransferActivity : AppCompatActivity() {
 
-    // UI Components
     private lateinit var edtReceiverAccountNumber: EditText
     private lateinit var btnCheckReceiver: Button
     private lateinit var tvReceiverName: TextView
@@ -24,13 +27,13 @@ class TransferActivity : AppCompatActivity() {
     private lateinit var edtTransferContent: EditText
     private lateinit var btnConfirmTransfer: Button
 
-    // Firebase
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
-    // State variables
     private var receiverAccountRef: DocumentReference? = null
     private var isReceiverChecked = false
+    
+    private var currentOTP: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +45,6 @@ class TransferActivity : AppCompatActivity() {
         initViews()
         initActions()
         loadSenderBalance()
-
     }
 
     private fun initViews() {
@@ -57,7 +59,7 @@ class TransferActivity : AppCompatActivity() {
 
     private fun initActions() {
         btnCheckReceiver.setOnClickListener { checkReceiver() }
-        btnConfirmTransfer.setOnClickListener { performTransfer() }
+        btnConfirmTransfer.setOnClickListener { initiateTransferProcess() }
     }
 
     private fun loadSenderBalance() {
@@ -93,8 +95,6 @@ class TransferActivity : AppCompatActivity() {
             return
         }
 
-
-        // Find the receiver's checking account
         db.collection("accounts")
             .whereEqualTo("type", "checking")
             .whereEqualTo("accountId", receiverAccountId)
@@ -110,7 +110,6 @@ class TransferActivity : AppCompatActivity() {
                 val receiverAccountDoc = accountSnapshot.documents[0]
                 val receiverUid = receiverAccountDoc.getString("uid") ?: ""
 
-                // **KIỂM TRA CHUYỂN TIỀN CHO CHÍNH MÌNH**
                 if (receiverUid == auth.currentUser?.uid) {
                     Toast.makeText(this, "Không thể tự chuyển tiền cho chính mình", Toast.LENGTH_LONG).show()
                     isReceiverChecked = false
@@ -120,7 +119,6 @@ class TransferActivity : AppCompatActivity() {
 
                 receiverAccountRef = receiverAccountDoc.reference
 
-                // Find the customer's name
                 db.collection("customers").document(receiverUid).get()
                     .addOnSuccessListener { customerDoc ->
                         if (customerDoc.exists()) {
@@ -138,8 +136,8 @@ class TransferActivity : AppCompatActivity() {
                 Toast.makeText(this, "Lỗi khi kiểm tra: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
-
-    private fun performTransfer() {
+    
+    private fun initiateTransferProcess() {
         if (!isReceiverChecked || receiverAccountRef == null) {
             Toast.makeText(this, "Vui lòng kiểm tra thông tin người nhận trước", Toast.LENGTH_SHORT).show()
             return
@@ -155,11 +153,80 @@ class TransferActivity : AppCompatActivity() {
             Toast.makeText(this, "Số tiền chuyển phải lớn hơn 0", Toast.LENGTH_SHORT).show()
             return
         }
+        
+        val uid = auth.currentUser?.uid ?: return
+        db.collection("accounts")
+            .whereEqualTo("uid", uid)
+            .whereEqualTo("type", "checking")
+            .limit(1)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (!snapshot.isEmpty) {
+                    val balance = snapshot.documents[0].getDouble("balance") ?: 0.0
+                    if (balance < transferAmount) {
+                         Toast.makeText(this, "Số dư không đủ để thực hiện giao dịch", Toast.LENGTH_LONG).show()
+                         return@addOnSuccessListener
+                    }
+                    
+                    sendOTPAndShowDialog()
+                } else {
+                     Toast.makeText(this, "Không tìm thấy tài khoản nguồn", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+    
+    private fun sendOTPAndShowDialog() {
+        val currentUser = auth.currentUser
+        val userEmail = currentUser?.email
+        
+        if (userEmail == null) {
+            Toast.makeText(this, "Không tìm thấy email của bạn để gửi OTP", Toast.LENGTH_LONG).show()
+            return
+        }
+        
+        currentOTP = Random.nextInt(100000, 999999).toString()
+        
+        Toast.makeText(this, "Đang gửi mã OTP đến $userEmail...", Toast.LENGTH_SHORT).show()
+        
+        lifecycleScope.launch {
+            val isSent = GMailSender.sendOTPEmail(userEmail, currentOTP)
+            if (isSent) {
+                Toast.makeText(this@TransferActivity, "Đã gửi OTP thành công! Vui lòng kiểm tra email.", Toast.LENGTH_LONG).show()
+                showOTPDialog()
+            } else {
+                Toast.makeText(this@TransferActivity, "Gửi OTP thất bại. Vui lòng kiểm tra kết nối mạng.", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+    
+    private fun showOTPDialog() {
+        val inputEditTextField = EditText(this)
+        inputEditTextField.hint = "Nhập mã 6 số"
+        
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Xác thực giao dịch")
+            .setMessage("Mã OTP đã được gửi đến email của bạn.\nVui lòng nhập mã để xác nhận chuyển tiền.")
+            .setView(inputEditTextField)
+            .setCancelable(false)
+            .setPositiveButton("Xác nhận") { _, _ ->
+                val enteredOTP = inputEditTextField.text.toString()
+                if (enteredOTP == currentOTP) {
+                    performTransfer()
+                } else {
+                    Toast.makeText(this, "Mã OTP không chính xác!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Hủy bỏ", null)
+            .create()
+        dialog.show()
+    }
 
+    private fun performTransfer() {
+        val amountString = edtTransferAmount.text.toString()
+        val transferAmount = amountString.toDouble()
         val content = edtTransferContent.text.toString().ifEmpty { "Chuyen khoan noi bo" }
         val senderId = auth.currentUser?.uid ?: return
 
-        // Find sender's checking account first
         db.collection("accounts")
             .whereEqualTo("uid", senderId)
             .whereEqualTo("type", "checking")
@@ -172,13 +239,11 @@ class TransferActivity : AppCompatActivity() {
                 }
                 val senderAccountRef = senderAccountSnapshot.documents[0].reference
 
-                // **Đảm bảo không tự chuyển cho mình lần nữa**
                 if (senderAccountRef.path == receiverAccountRef?.path) {
                     Toast.makeText(this, "Thao tác không hợp lệ.", Toast.LENGTH_SHORT).show()
                     return@addOnSuccessListener
                 }
 
-                // Run the transaction
                 db.runTransaction { transaction ->
 
                     val senderSnap = transaction.get(senderAccountRef)
@@ -195,13 +260,11 @@ class TransferActivity : AppCompatActivity() {
                     val toAccountId = receiverSnap.getString("accountId")!!
                     val receiverUid = receiverSnap.getString("uid")!!
 
-                    // 1️⃣ UPDATE BALANCE
                     transaction.update(senderAccountRef, "balance", senderBalance - transferAmount)
                     transaction.update(receiverAccountRef!!, "balance", receiverBalance + transferAmount)
 
                     val time = Timestamp.now()
 
-                    // 2️⃣ TRANSACTION – NGƯỜI GỬI (TRỪ TIỀN)
                     val senderTransaction = hashMapOf(
                         "transactionId" to "T${System.currentTimeMillis()}_OUT",
                         "uid" to senderId,
@@ -214,7 +277,6 @@ class TransferActivity : AppCompatActivity() {
                         "type" to "internal_transfer_out"
                     )
 
-                    // 3️⃣ TRANSACTION – NGƯỜI NHẬN (CỘNG TIỀN)
                     val receiverTransaction = hashMapOf(
                         "transactionId" to "T${System.currentTimeMillis()}_IN",
                         "uid" to receiverUid,
@@ -233,7 +295,7 @@ class TransferActivity : AppCompatActivity() {
                     null
                 }.addOnSuccessListener {
                     Toast.makeText(this, "Chuyển khoản thành công!", Toast.LENGTH_SHORT).show()
-                    setResult(Activity.RESULT_OK) // Trả về kết quả để màn hình Home biết cần cập nhật
+                    setResult(Activity.RESULT_OK)
                     finish()
                 }.addOnFailureListener { e ->
                     Toast.makeText(this, "Giao dịch thất bại: ${e.message}", Toast.LENGTH_LONG).show()

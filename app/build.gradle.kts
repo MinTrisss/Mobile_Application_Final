@@ -20,6 +20,15 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    
+    packaging {
+        resources {
+            pickFirsts.add("META-INF/LICENSE.txt")
+            pickFirsts.add("META-INF/NOTICE.txt")
+            pickFirsts.add("META-INF/LICENSE.md")
+            pickFirsts.add("META-INF/NOTICE.md")
+        }
+    }
 
     buildTypes {
         release {
@@ -69,6 +78,10 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    // JavaMail API for Android
+    implementation("com.sun.mail:android-mail:1.6.7")
+    implementation("com.sun.mail:android-activation:1.6.7")
 
 
     testImplementation(libs.junit)
