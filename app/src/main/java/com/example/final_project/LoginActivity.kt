@@ -12,7 +12,7 @@ import android.widget.Toast
 import com.google.firebase.firestore.FirebaseFirestore
 import android.content.Intent
 import android.util.Log
-
+import android.widget.ImageButton
 
 
 class LoginActivity : AppCompatActivity() {
@@ -21,6 +21,8 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var edtEmail: EditText
     private lateinit var edtPassword: EditText
     private lateinit var btnLogin: Button
+    private lateinit var  btnFaceLogin: ImageButton
+
     private val db = FirebaseFirestore.getInstance()
 
 
@@ -38,7 +40,6 @@ class LoginActivity : AppCompatActivity() {
         edtEmail = findViewById(R.id.edtEmail)
         edtPassword = findViewById(R.id.edtPassword)
         btnLogin = findViewById(R.id.btnLogin)
-
 
         btnLogin.setOnClickListener {
 
@@ -132,7 +133,6 @@ class LoginActivity : AppCompatActivity() {
         val uid = auth.currentUser?.uid ?: return
         val db = FirebaseFirestore.getInstance()
 
-        // Step 1: Check Employee collection
         db.collection("employees").document(uid).get()
             .addOnSuccessListener { employeeDoc ->
 
@@ -145,12 +145,10 @@ class LoginActivity : AppCompatActivity() {
                         return@addOnSuccessListener
                     }
 
-                    // Navigate to employee home
                     navigateToEmployeeScreen()
                     return@addOnSuccessListener
                 }
 
-                // Step 2: Not employee → Check Customer collection
                 db.collection("customers").document(uid).get()
                     .addOnSuccessListener { customerDoc ->
 
@@ -163,9 +161,16 @@ class LoginActivity : AppCompatActivity() {
                                 return@addOnSuccessListener
                             }
 
-                            navigateToCustomerScreen()
+                            val ekycStatus = customerDoc.getString("ekycStatus") ?: "pending"
+                            val faceUrl = customerDoc.getString("faceImageURL")
+
+                            if (ekycStatus != "verified") {
+                                navigateToEkycScreen(faceUrl)
+                            } else {
+                                navigateToCustomerScreen()
+                            }
+
                         } else {
-                            // Not found anywhere
                             auth.signOut()
                             Toast.makeText(this, "Không tìm thấy tài khoản!", Toast.LENGTH_LONG).show()
                         }
@@ -181,7 +186,39 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
+    // Trong LoginActivity.kt
+    private fun startFaceLogin(identifier: String) {
+        val query = if (identifier.contains("@")) {
+            db.collection("customers").whereEqualTo("email", identifier)
+        } else {
+            db.collection("customers").whereEqualTo("phoneNum", identifier)
+        }
 
+        // Trong LoginActivity.kt -> hàm startFaceLogin
+        query.get().addOnSuccessListener { snap ->
+            if (!snap.isEmpty) {
+                val doc = snap.documents[0]
+                val email = doc.getString("email")
+                val savedFaceUrl = doc.getString("faceImageURL")
+
+                val intent = Intent(this, EkycActivity::class.java)
+                intent.putExtra("IS_LOGIN_MODE", true)
+                intent.putExtra("SAVED_FACE_URL", savedFaceUrl)
+                intent.putExtra("LOGIN_EMAIL", email) // QUAN TRỌNG: Truyền email sang
+                startActivity(intent)
+            }
+        }
+    }
+
+    // Trong LoginActivity.kt
+    private fun navigateToEkycScreen(savedFaceUrl: String?) {
+        val intent = Intent(this, EkycActivity::class.java)
+        // Nếu chưa verified, ta truyền mode "REGISTRATION" (đăng ký ảnh)
+        intent.putExtra("IS_LOGIN_MODE", false)
+        intent.putExtra("SAVED_FACE_URL", savedFaceUrl)
+        startActivity(intent)
+        finish()
+    }
     private fun navigateToEmployeeScreen() {
         Toast.makeText(applicationContext, "Bạn đã đăng nhập thành công.", Toast.LENGTH_LONG).show()
         val intent = Intent(this, EmployeeHomeActivity::class.java)

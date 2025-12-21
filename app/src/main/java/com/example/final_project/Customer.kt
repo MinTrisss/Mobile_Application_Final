@@ -16,6 +16,7 @@ data class Customer(
     val gender: String = "",
     val address: String = "",
     val dateOfBirth: Timestamp? = null,
+
     val createdAt: Timestamp? = null
 )
 

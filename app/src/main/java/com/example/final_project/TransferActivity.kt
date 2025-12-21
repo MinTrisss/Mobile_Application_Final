@@ -16,6 +16,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+import android.content.Intent
+
 
 class TransferActivity : AppCompatActivity() {
 
@@ -148,12 +150,8 @@ class TransferActivity : AppCompatActivity() {
             Toast.makeText(this, "Vui lòng nhập số tiền", Toast.LENGTH_SHORT).show()
             return
         }
-        val transferAmount = amountString.toDoubleOrNull()
-        if (transferAmount == null || transferAmount <= 0) {
-            Toast.makeText(this, "Số tiền chuyển phải lớn hơn 0", Toast.LENGTH_SHORT).show()
-            return
-        }
-        
+        val transferAmount = edtTransferAmount.text.toString().toDoubleOrNull() ?: 0.0
+
         val uid = auth.currentUser?.uid ?: return
         db.collection("accounts")
             .whereEqualTo("uid", uid)
@@ -164,13 +162,35 @@ class TransferActivity : AppCompatActivity() {
                 if (!snapshot.isEmpty) {
                     val balance = snapshot.documents[0].getDouble("balance") ?: 0.0
                     if (balance < transferAmount) {
-                         Toast.makeText(this, "Số dư không đủ để thực hiện giao dịch", Toast.LENGTH_LONG).show()
-                         return@addOnSuccessListener
+                        Toast.makeText(this, "Số dư không đủ", Toast.LENGTH_LONG).show()
+                        return@addOnSuccessListener
                     }
-                    
-                    sendOTPAndShowDialog()
+
+                    // Bước 2: KIỂM TRA HẠN MỨC 10 TRIÊU
+                    if (transferAmount >= 10000000) {
+                        // Nếu >= 10 triệu, bắt buộc quét mặt trước
+                        startFaceVerification()
+                    } else {
+                        // Dưới 10 triệu thì chỉ cần OTP như cũ
+                        sendOTPAndShowDialog()
+                    }
+                }
+            }
+    }
+    private fun startFaceVerification() {
+        val uid = auth.currentUser?.uid ?: return
+        // Lấy thông tin faceImageURL của user hiện tại để đối chiếu
+        db.collection("customers").document(uid).get()
+            .addOnSuccessListener { doc ->
+                val savedFaceUrl = doc.getString("faceImageURL")
+                if (savedFaceUrl.isNullOrEmpty()) {
+                    Toast.makeText(this, "Bạn chưa đăng ký eKYC khuôn mặt để thực hiện giao dịch lớn", Toast.LENGTH_LONG).show()
                 } else {
-                     Toast.makeText(this, "Không tìm thấy tài khoản nguồn", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, EkycActivity::class.java)
+                    intent.putExtra("IS_LOGIN_MODE", true) // Dùng mode xác thực
+                    intent.putExtra("SAVED_FACE_URL", savedFaceUrl)
+                    // Dùng ActivityResultLauncher hoặc startActivityForResult
+                    startActivityForResult(intent, 999)
                 }
             }
     }
@@ -196,6 +216,16 @@ class TransferActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this@TransferActivity, "Gửi OTP thất bại. Vui lòng kiểm tra kết nối mạng.", Toast.LENGTH_LONG).show()
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 999 && resultCode == Activity.RESULT_OK) {
+            // Quét mặt thành công -> Tiếp tục bước gửi OTP
+            Toast.makeText(this, "Xác thực khuôn mặt thành công!", Toast.LENGTH_SHORT).show()
+            sendOTPAndShowDialog()
         }
     }
     

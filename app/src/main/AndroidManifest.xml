@@ -6,12 +6,13 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:node="replace" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="replace" />
-
-    <!-- Quyền truy cập vị trí -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:node="replace" /> <!-- Quyền truy cập vị trí -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -21,9 +22,14 @@
         android:roundIcon="@drawable/ic_transfer"
         android:supportsRtl="true"
         android:theme="@style/Theme.Final_project">
+        <activity
+            android:name=".EkycActivity"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBW8XgQMXDNLA87szGFJHcsKyh3ZvyHVx0" />
+
         <activity
             android:name=".DepositWithdrawActivity"
             android:exported="false" />
@@ -84,7 +90,7 @@
         <activity
             android:name=".BranchLocatorActivity"
             android:exported="false"
-            android:label="Tìm chi nhánh gần nhất"/>
+            android:label="Tìm chi nhánh gần nhất" />
         <activity
             android:name=".LoginActivity"
             android:exported="true"
