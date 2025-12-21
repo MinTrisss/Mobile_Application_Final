@@ -42,13 +42,14 @@ class EmployeeHomeActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
 
         val btnAddCustomer = findViewById<Button>(R.id.btnAddCustomer)
         val btnAdjustRate = findViewById<Button>(R.id.btnAdjustRate)
         val btnLogout = findViewById<ImageView>(R.id.btnLogoutEmployee)
         val btnWithdrawActivity = findViewById<Button>(R.id.btnWithdrawDeposit)
+        val btnLoanManagement = findViewById<Button>(R.id.btnLoanManagement)
         val txtOfficerTitle = findViewById<TextView>(R.id.txtOfficerTitle)
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
 
         if (uid != null) {
             db.collection("employees")
@@ -131,7 +132,11 @@ class EmployeeHomeActivity : AppCompatActivity() {
         btnAdjustRate.setOnClickListener {
             startActivity(Intent(this, EditInterestRateActivity::class.java))
         }
-
+        btnLoanManagement.setOnClickListener {
+            val intent = Intent(this, LoanManagementActivity::class.java)
+            intent.putExtra("userRole", "employee")
+            startActivity(intent)
+        }
 
         btnLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()

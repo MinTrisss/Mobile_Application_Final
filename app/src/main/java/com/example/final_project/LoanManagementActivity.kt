@@ -14,7 +14,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
-import java.text.SimpleDateFormat
+import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import java.util.*
 
 class LoanManagementActivity : AppCompatActivity() {
@@ -27,10 +28,13 @@ class LoanManagementActivity : AppCompatActivity() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private var loansListener: ListenerRegistration? = null
+    private var userRole: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_loan_management)
+
+        userRole = intent.getStringExtra("userRole")
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -40,7 +44,9 @@ class LoanManagementActivity : AppCompatActivity() {
         fabRegisterLoan = findViewById(R.id.fabRegisterLoan)
 
         rvLoans.layoutManager = LinearLayoutManager(this)
-        loansAdapter = LoanAdapter(loansList)
+        loansAdapter = LoanAdapter(loansList, isEmployee = userRole == "employee", onStatusClick = { loan ->
+            showStatusUpdateDialog(loan)
+        })
         rvLoans.adapter = loansAdapter
 
         fabRegisterLoan.setOnClickListener {
@@ -53,54 +59,80 @@ class LoanManagementActivity : AppCompatActivity() {
         listenForLoanChanges()
     }
 
-    override fun onStop() {
-        super.onStop()
-        loansListener?.remove()
-    }
-
     private fun listenForLoanChanges() {
         val uid = auth.currentUser?.uid ?: return
 
-        loansListener = db.collection("accounts")
-            .whereEqualTo("uid", uid)
-            .whereEqualTo("type", "loan")
-            .orderBy("createdAt", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshots, e ->
+        Log.d("LOAN_DEBUG", "Current User Role: $userRole")
 
-                if (e != null || snapshots == null) {
-                    Toast.makeText(this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show()
+        var baseQuery = db.collection("accounts").whereEqualTo("type", "loan")
+
+        if (userRole != "employee") {
+            baseQuery = baseQuery.whereEqualTo("uid", uid)
+        }
+
+        // Lắng nghe realtime
+        loansListener = baseQuery
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .addSnapshotListener(this) { snapshots, e ->
+                if (e != null) {
+                    Log.e("LOAN_ERROR", "Error: ${e.message}")
                     return@addSnapshotListener
                 }
 
-                loansList.clear()
-
-                for (doc in snapshots.documents) {
-
-                    loansList.add(
-                        Loan(
-                            id = doc.id,
-                            uid = uid,
-                            principal = doc.getDouble("principal") ?: 0.0,
-
-                            // ✅ LẤY TRỰC TIẾP TỪ DOCUMENT LOAN
-                            interestRate = doc.getDouble("interestRate") ?: 0.0,
-
-                            termMonths = (doc.getLong("termMonths") ?: 12L).toInt(),
-
-                            monthlyPayment = doc.getDouble("monthlyPayment") ?: 0.0,
-
-                            status = doc.getString("status") ?: "PENDING",
-
-                            totalPayment = doc.getDouble("totalPayment") ?: 0.0,
-                            totalInterest = doc.getDouble("totalInterest") ?: 0.0,
-
-                            createdAt = doc.getTimestamp("createdAt")?.toDate() ?: Date()
-                        )
-                    )
+                if (snapshots != null) {
+                    loansList.clear()
+                    for (doc in snapshots.documents) {
+                        loansList.add(mapDocumentToLoan(doc))
+                    }
+                    loansAdapter.notifyDataSetChanged()
+                    Log.d("LOAN_DEBUG", "Realtime update fired")
                 }
-
-                loansAdapter.notifyDataSetChanged()
             }
+    }
+
+    private fun mapDocumentToLoan(doc: com.google.firebase.firestore.DocumentSnapshot): Loan {
+        return Loan(
+            id = doc.id,
+            uid = doc.getString("uid") ?: "",
+            principal = doc.getDouble("principal") ?: 0.0,
+            interestRate = doc.getDouble("interestRate") ?: 0.0,
+            termMonths = (doc.getLong("termMonths") ?: 12L).toInt(),
+            monthlyPayment = doc.getDouble("monthlyPayment") ?: 0.0,
+            status = doc.getString("status") ?: "Chờ duyệt",
+            totalPayment = doc.getDouble("totalPayment") ?: 0.0,
+            totalInterest = doc.getDouble("totalInterest") ?: 0.0,
+            createdAt = doc.getTimestamp("createdAt")?.toDate() ?: Date()
+        )
+    }
+
+    // Thêm vào trong LoanManagementActivity
+    private fun showStatusUpdateDialog(loan: Loan) {
+        val statuses: Array<String>
+
+        if (loan.status == "Chấp nhận" || loan.status == "Từ chối") {
+            statuses = arrayOf("Chấp nhận", "Từ chối")
+        } else {
+            statuses = arrayOf("Chấp nhận", "Chờ duyệt", "Từ chối")
+        }
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Thay đổi trạng thái cho #${loan.id.takeLast(6)}")
+        builder.setItems(statuses) { _, which ->
+            val newStatus = statuses[which]
+            updateLoanStatus(loan.id, newStatus)
+        }
+        builder.show()
+    }
+
+    private fun updateLoanStatus(loanId: String, newStatus: String) {
+        val index = loansList.indexOfFirst { it.id == loanId }
+        if (index != -1) {
+            loansList[index] = loansList[index].copy(status = newStatus)
+            loansAdapter.notifyItemChanged(index)
+        }
+
+        db.collection("accounts").document(loanId)
+            .update("status", newStatus)
     }
 
     override fun onSupportNavigateUp(): Boolean {

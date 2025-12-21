@@ -60,10 +60,10 @@
         android:layout_marginTop="8dp" />
 
     <Button
-        android:id="@+id/btnEKYC"
+        android:id="@+id/btnLoanManagement"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Verify Customer eKYC"
+        android:text="QUản lý thế chấp"
         android:layout_marginTop="8dp" />
 
     <Button

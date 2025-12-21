@@ -8,7 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class LoanAdapter(private val loans: List<Loan>) :
+class LoanAdapter(
+    private val loans: List<Loan>,
+    private val isEmployee: Boolean,
+    private val onStatusClick: (Loan) -> Unit
+    ) :
     RecyclerView.Adapter<LoanAdapter.LoanViewHolder>() {
 
     class LoanViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -29,15 +33,26 @@ class LoanAdapter(private val loans: List<Loan>) :
     override fun onBindViewHolder(holder: LoanViewHolder, position: Int) {
         val loan = loans[position]
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
-        when (loan.status.lowercase()) {
-            "approved" -> holder.tvLoanStatus.setBackgroundResource(R.drawable.bg_status_success)
-            "pending" -> holder.tvLoanStatus.setBackgroundResource(R.drawable.bg_status_pending)
-            "rejected" -> holder.tvLoanStatus.setBackgroundResource(R.drawable.bg_status_rejected)
+        if (isEmployee) {
+            holder.itemView.setOnClickListener { onStatusClick(loan) }
+            // Có thể thêm icon gợi ý nhấn để sửa
+        }
+        when (loan.status.lowercase().trim()) {
+            "chấp nhận" -> {
+                holder.tvLoanStatus.text = "Chấp nhận"
+                holder.tvLoanStatus.setBackgroundResource(R.drawable.bg_status_success)
+            }
+            "từ chối" -> {
+                holder.tvLoanStatus.text = "Từ chối"
+                holder.tvLoanStatus.setBackgroundResource(R.drawable.bg_status_rejected)
+            }
+            else -> { // "chờ duyệt" hoặc các trường hợp khác
+                holder.tvLoanStatus.text = "Chờ duyệt"
+                holder.tvLoanStatus.setBackgroundResource(R.drawable.bg_status_pending)
+            }
         }
 
         holder.tvLoanId.text = "Khoản vay #${loan.id.takeLast(6)}"
-        holder.tvLoanStatus.text = loan.status
 
         holder.tvLoanAmount.text =
             "Số tiền vay: ${String.format("%,.0f", loan.principal)} VNĐ"

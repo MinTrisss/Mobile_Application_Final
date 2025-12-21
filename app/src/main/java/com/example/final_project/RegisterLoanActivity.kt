@@ -163,7 +163,7 @@ class RegisterLoanActivity : AppCompatActivity() {
             "totalPayment" to totalPayment,
             "totalInterest" to totalInterest,
 
-            "status" to "PENDING",
+            "status" to "Chờ duyệt",
             "createdAt" to Timestamp.now()
         )
 
