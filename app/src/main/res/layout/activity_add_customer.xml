@@ -10,6 +10,8 @@
         android:orientation="vertical">
 
         <!-- Toolbar -->
+
+        <!-- Section Title -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbarAddCustomer"
             android:layout_width="match_parent"
@@ -18,11 +20,10 @@
             android:title="Add Customer"
             android:titleTextColor="@android:color/white" />
 
-        <!-- Section Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Customer Information"
+            android:text="Thông tin khách hàng"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginTop="20dp" />

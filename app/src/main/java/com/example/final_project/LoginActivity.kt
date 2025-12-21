@@ -68,7 +68,38 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginWithEmail(email: String, password: String) {
+        // Bước 1: Truy vấn Firestore để lấy thông tin khách hàng dựa trên email
+        db.collection("customers")
+            .whereEqualTo("email", email)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { snap ->
+                if (snap.isEmpty) {
+                    // Nếu không tìm thấy trong customers, có thể là nhân viên
+                    // Thực hiện đăng nhập thẳng bằng Firebase Auth cho nhân viên
+                    performFirebaseAuth(email, password)
+                    return@addOnSuccessListener
+                }
 
+                val doc = snap.documents[0]
+                val savedHashedPassword = doc.getString("password") ?: ""
+                val inputHashedPassword = hashPassword(password)
+
+                // Bước 2: So sánh bản băm mật khẩu
+                if (inputHashedPassword == savedHashedPassword) {
+                    // Nếu khớp, thực hiện đăng nhập Firebase Auth
+                    performFirebaseAuth(email, password)
+                } else {
+                    Toast.makeText(this, "Mật khẩu không chính xác!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Lỗi kết nối dữ liệu!", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    // Hàm bổ trợ để thực hiện đăng nhập Firebase Auth sau khi đã check mật khẩu
+    private fun performFirebaseAuth(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener {
                 logLoginHistory()
@@ -80,35 +111,26 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginWithPhone(phone: String, password: String) {
-
         db.collection("customers")
             .whereEqualTo("phoneNum", phone)
             .limit(1)
             .get()
             .addOnSuccessListener { snap ->
-
                 if (snap.isEmpty) {
                     Toast.makeText(this, "Số điện thoại không tồn tại!", Toast.LENGTH_SHORT).show()
                     return@addOnSuccessListener
                 }
 
-                val email = snap.documents[0].getString("email")
-                if (email.isNullOrEmpty()) {
-                    Toast.makeText(this, "Email không tồn tại!", Toast.LENGTH_SHORT).show()
-                    return@addOnSuccessListener
-                }
+                val doc = snap.documents[0]
+                val email = doc.getString("email") ?: ""
+                val savedHashedPassword = doc.getString("password") ?: ""
+                val inputHashedPassword = hashPassword(password)
 
-                auth.signInWithEmailAndPassword(email, password)
-                    .addOnSuccessListener {
-                        logLoginHistory()
-                        checkUserRoleAndNavigate()
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(this, it.message ?: "Đăng nhập thất bại", Toast.LENGTH_SHORT).show()
-                    }
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show()
+                if (inputHashedPassword == savedHashedPassword) {
+                    performFirebaseAuth(email, password)
+                } else {
+                    Toast.makeText(this, "Mật khẩu không chính xác!", Toast.LENGTH_SHORT).show()
+                }
             }
     }
 
@@ -208,6 +230,13 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+
+    private fun hashPassword(password: String): String {
+        val bytes = password.toByteArray()
+        val md = java.security.MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        return digest.fold("") { str, it -> str + "%02x".format(it) }
     }
 
     // Trong LoginActivity.kt

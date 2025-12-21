@@ -18,7 +18,6 @@ class CustomerAdapter(
 ) : RecyclerView.Adapter<CustomerAdapter.VH>() {
 
     inner class VH(v: View) : RecyclerView.ViewHolder(v) {
-        val imgAvatar: ImageView = v.findViewById(R.id.imgCustomerAvatar)
         val txtName: TextView = v.findViewById(R.id.txtCustomerName)
         val txtMeta: TextView = v.findViewById(R.id.txtCustomerMeta)
         val txtStatus: TextView = v.findViewById(R.id.txtCustomerStatus)
@@ -38,6 +37,7 @@ class CustomerAdapter(
         h.txtName.text = c.name
         h.txtMeta.text = "${c.nationalId} · ${c.phoneNum}"
         h.txtStatus.text = "Trạng thái: ${c.status}"
+
         Log.d("DEBUG", "nationalId = ${c.nationalId}")
 
         h.txtStatus.setTextColor(
@@ -47,12 +47,6 @@ class CustomerAdapter(
                 else -> Color.GRAY
             }
         )
-
-        Glide.with(h.itemView.context)
-            .load(c.avtURL)
-            .placeholder(R.drawable.ic_user)
-            .error(R.drawable.ic_user)
-            .into(h.imgAvatar)
 
         h.btnEdit.setOnClickListener { onEdit(c) }
         h.btnDelete.setOnClickListener { onToggleStatus(c) }

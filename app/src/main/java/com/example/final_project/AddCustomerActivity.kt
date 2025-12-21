@@ -4,9 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-//import android.util.Log
-//import android.view.Menu
-//import android.view.MenuItem
 import android.util.Log
 import android.app.DatePickerDialog
 import android.view.Menu
@@ -49,7 +46,7 @@ class AddCustomerActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbarAddCustomer)
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
-            title = "Add Customer"
+            title = "Thêm khách hàng"
             setDisplayHomeAsUpEnabled(true)
         }
         // Mapping views
@@ -69,6 +66,10 @@ class AddCustomerActivity : AppCompatActivity() {
         edtDOB.setOnClickListener { showDatePicker() }
         btnChooseImage.setOnClickListener { pickImageFromGallery() }
         btnAddCustomer.setOnClickListener { addCustomer() }
+        btnChooseImage = findViewById(R.id.btnChooseImage)
+        imgAvatarPreview = findViewById(R.id.imgAvatarPreview)
+
+        btnChooseImage.setOnClickListener { pickImageFromGallery() }
 
     }
 
@@ -162,7 +163,10 @@ class AddCustomerActivity : AppCompatActivity() {
             .addOnSuccessListener { result ->
                 val uid = result.user?.uid ?: return@addOnSuccessListener
 
-                uploadAvatarAndSave(uid, name, email, phone, nationalId, dobTimestamp, gender, address)
+                val hashedPassword = hashPassword(password)
+
+
+                uploadAvatarAndSave(uid, name, email, phone, nationalId, dobTimestamp, gender, address, hashedPassword)
 
             }
             .addOnFailureListener {
@@ -179,7 +183,12 @@ class AddCustomerActivity : AppCompatActivity() {
             null
         }
     }
-
+    private fun hashPassword(password: String): String {
+        val bytes = password.toByteArray()
+        val md = java.security.MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        return digest.fold("") { str, it -> str + "%02x".format(it) }
+    }
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
 
@@ -204,13 +213,6 @@ class AddCustomerActivity : AppCompatActivity() {
         datePicker.show()
     }
 
-    private fun getRealUri(uri: Uri): Uri {
-        if (uri.toString().contains("com.google.android.apps.photos.contentprovider"))
-            return Uri.parse(uri.toString().replace("/ORIGINAL", ""))
-
-        return uri
-    }
-
     private fun uploadAvatarAndSave(
         uid: String,
         name: String,
@@ -219,28 +221,31 @@ class AddCustomerActivity : AppCompatActivity() {
         nationalId: String,
         dob: Timestamp,
         gender: String,
-        address: String
+        address: String,
+        hashedPassword: String
     ) {
         if (imageUri == null) {
-            saveCustomer(uid, name, email, phone, nationalId, dob, gender, address, "")
+            // avatarUrl là "", password là hashedPassword -> Đúng thứ tự
+            saveCustomer(uid, name, email, phone, nationalId, dob, gender, address, "", hashedPassword)
             return
         }
 
         val storageRef = FirebaseStorage.getInstance()
-            .reference.child("avatars/$uid.jpg") // ✅ dùng uid
+            .reference.child("avatars/$uid.jpg")
 
         storageRef.putFile(imageUri!!)
             .addOnSuccessListener {
                 storageRef.downloadUrl.addOnSuccessListener { uri ->
+                    // SỬA TẠI ĐÂY: avatarUrl là uri.toString(), password là hashedPassword
                     saveCustomer(
                         uid, name, email, phone,
-                        nationalId, dob, gender, address, uri.toString()
+                        nationalId, dob, gender, address, uri.toString(), hashedPassword
                     )
                 }
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Upload failed: ${it.message}", Toast.LENGTH_SHORT).show()
-                saveCustomer(uid, name, email, phone, nationalId, dob, gender, address, "")
+                saveCustomer(uid, name, email, phone, nationalId, dob, gender, address, "", hashedPassword)
             }
     }
 
@@ -253,11 +258,13 @@ class AddCustomerActivity : AppCompatActivity() {
         dob: Timestamp,
         gender: String,
         address: String,
-        avatarUrl: String
+        avatarUrl: String,
+        hashedPassword: String
     ) {
         val data = mapOf(
             "uid" to uid,
             "name" to name,
+            "password" to hashedPassword,
             "email" to email,
             "phoneNum" to phone,
             "nationalId" to nationalId,

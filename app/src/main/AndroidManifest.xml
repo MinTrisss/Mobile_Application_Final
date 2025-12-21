@@ -37,6 +37,9 @@
             android:name=".EditCustomerActivity"
             android:exported="false" />
         <activity
+            android:name=".EditInterestRateActivity"
+            android:exported="false" />
+        <activity
             android:name=".CustomerDetailActivity"
             android:exported="false" />
         <activity

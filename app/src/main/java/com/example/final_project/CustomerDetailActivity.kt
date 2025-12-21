@@ -18,6 +18,7 @@ import androidx.appcompat.widget.Toolbar
 import com.bumptech.glide.Glide
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
+import android.util.Log
 import java.util.*
 class CustomerDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,6 +86,7 @@ class CustomerDetailActivity : AppCompatActivity() {
                 .get()
                 .addOnSuccessListener { userDoc ->
                     val role = userDoc.getString("role")
+                    Log.d("CustomerDetailActivity", "Role: $role")
 
                     if (role == "employee") {
                         btnEdit.visibility = View.GONE

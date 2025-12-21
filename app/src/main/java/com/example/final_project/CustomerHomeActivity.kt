@@ -12,13 +12,13 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import java.text.SimpleDateFormat
-import java.util.Locale
+import android.widget.Toast
 
 class CustomerHomeActivity : AppCompatActivity() {
     private lateinit var txtWelcome: TextView
     private lateinit var txtBalance: TextView
     private lateinit var txtAccountNumber: TextView
+
 
     private val auth = FirebaseAuth.getInstance()
     private val db = FirebaseFirestore.getInstance()
@@ -91,6 +91,8 @@ class CustomerHomeActivity : AppCompatActivity() {
                     txtAccountNumber.text = "Số tài khoản: N/A"
                 }
             }
+
+
     }
 
     private fun initActions() {
@@ -135,7 +137,15 @@ class CustomerHomeActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.imgAvatar).setOnClickListener {
-            startActivity(Intent(this, CustomerDetailActivity::class.java))
+            val currentUser = auth.currentUser
+            if (currentUser != null) {
+                val intent = Intent(this, CustomerDetailActivity::class.java)
+                // Gửi UID sang để CustomerDetailActivity biết hiển thị thông tin của ai
+                intent.putExtra("uid", currentUser.uid)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "Không tìm thấy thông tin người dùng", Toast.LENGTH_SHORT).show()
+            }
         }
 
     }

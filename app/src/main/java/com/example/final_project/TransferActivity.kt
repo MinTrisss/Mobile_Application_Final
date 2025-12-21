@@ -166,12 +166,10 @@ class TransferActivity : AppCompatActivity() {
                         return@addOnSuccessListener
                     }
 
-                    // Bước 2: KIỂM TRA HẠN MỨC 10 TRIÊU
                     if (transferAmount >= 10000000) {
                         // Nếu >= 10 triệu, bắt buộc quét mặt trước
                         startFaceVerification()
                     } else {
-                        // Dưới 10 triệu thì chỉ cần OTP như cũ
                         sendOTPAndShowDialog()
                     }
                 }

@@ -15,16 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Avatar -->
-        <ImageView
-            android:id="@+id/imgCustomerAvatar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/circle_bg"
-            android:padding="4dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_user"/>
-
         <!-- Info -->
         <LinearLayout
             android:layout_weight="1"

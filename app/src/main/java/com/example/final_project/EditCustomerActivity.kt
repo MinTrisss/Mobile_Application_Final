@@ -18,6 +18,11 @@ import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import com.bumptech.glide.Glide
+import android.net.Uri
+import android.widget.ImageView
+import android.content.Intent
+import android.app.Activity
 
 
 
@@ -32,6 +37,11 @@ class EditCustomerActivity : AppCompatActivity() {
     private lateinit var edtNationalId: EditText
     private lateinit var edtEmail: EditText
     private lateinit var btnUpdate: Button
+    private lateinit var btnChooseImage: Button
+    private lateinit var imgAvatarPreview: ImageView
+    private var imageUri: Uri? = null
+    private val PICK_IMAGE_REQUEST = 1001
+
 
     private val db = FirebaseFirestore.getInstance()
 
@@ -72,6 +82,12 @@ class EditCustomerActivity : AppCompatActivity() {
             showDatePicker()
         }
 
+        btnChooseImage = findViewById(R.id.btnChooseImage)
+        imgAvatarPreview = findViewById(R.id.imgAvatarPreview)
+        btnChooseImage.setOnClickListener {
+            pickImageFromGallery()
+        }
+
         uid = intent.getStringExtra("uid") ?: ""
         if (uid.isNotEmpty()) {
             loadCustomerData()
@@ -95,8 +111,11 @@ class EditCustomerActivity : AppCompatActivity() {
     }
 
     private fun updateCustomer() {
-        val gender =
-            if (radioGender.checkedRadioButtonId == R.id.radioMale) "Nam" else "Nữ"
+        val name = edtFullName.text.toString().trim()
+        val phone = edtPhone.text.toString().trim()
+        val address = edtAddress.text.toString().trim()
+        val ekyc = edtEKYC.text.toString().trim()
+        val gender = if (radioGender.checkedRadioButtonId == R.id.radioMale) "Nam" else "Nữ"
 
         val dobString = edtDOB.text.toString()
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -106,17 +125,40 @@ class EditCustomerActivity : AppCompatActivity() {
             null
         }
 
+        btnUpdate.isEnabled = false // Khóa nút để tránh bấm nhiều lần
+
+        if (imageUri != null) {
+            // TRƯỜNG HỢP 1: CÓ CHỌN ẢNH MỚI
+            val storageRef = com.google.firebase.storage.FirebaseStorage.getInstance()
+                .reference.child("avatars/$uid.jpg")
+
+            storageRef.putFile(imageUri!!)
+                .addOnSuccessListener {
+                    storageRef.downloadUrl.addOnSuccessListener { uri ->
+                        saveToFirestore(name, phone, address, ekyc, gender, dobTimestamp, uri.toString())
+                    }
+                }
+                .addOnFailureListener {
+                    btnUpdate.isEnabled = true
+                    Toast.makeText(this, "Lỗi tải ảnh: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            // TRƯỜNG HỢP 2: KHÔNG ĐỔI ẢNH
+            saveToFirestore(name, phone, address, ekyc, gender, dobTimestamp, null)
+        }
+    }
+
+    private fun saveToFirestore(name: String, phone: String, address: String, ekyc: String, gender: String, dob: Timestamp?, avtURL: String?) {
         val data: MutableMap<String, Any> = hashMapOf(
-            "name" to edtFullName.text.toString(),
-            "phoneNum" to edtPhone.text.toString(),
-            "address" to edtAddress.text.toString(),
-            "ekycStatus" to edtEKYC.text.toString(),
+            "name" to name,
+            "phoneNum" to phone,
+            "address" to address,
+            "ekycStatus" to ekyc,
             "gender" to gender
         )
 
-        if (dobTimestamp != null) {
-            data["dateOfBirth"] = dobTimestamp
-        }
+        if (dob != null) data["dateOfBirth"] = dob
+        if (avtURL != null) data["avtURL"] = avtURL // Chỉ cập nhật field ảnh nếu có URL mới
 
         db.collection("customers")
             .document(uid)
@@ -126,8 +168,25 @@ class EditCustomerActivity : AppCompatActivity() {
                 finish()
             }
             .addOnFailureListener {
+                btnUpdate.isEnabled = true
                 Toast.makeText(this, "Cập nhật thất bại.", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun pickImageFromGallery() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+    }
+
+    // Thêm hàm nhận kết quả ảnh
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+            imageUri = data?.data
+            imgAvatarPreview.setImageURI(imageUri)
+        }
     }
 
     private fun loadCustomerData() {
@@ -146,6 +205,12 @@ class EditCustomerActivity : AppCompatActivity() {
                         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                         edtDOB.setText(sdf.format(dobTimestamp.toDate()))
                     }
+
+                    val currentAvt = document.getString("avtURL") ?: ""
+                    Glide.with(this)
+                        .load(currentAvt)
+                        .placeholder(R.drawable.ic_user)
+                        .into(imgAvatarPreview)
 
                     edtEKYC.setText(document.getString("ekycStatus"))
                     when (document.getString("gender")) {
