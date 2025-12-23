@@ -18,6 +18,9 @@ import android.graphics.Bitmap
 import android.provider.MediaStore
 import android.Manifest
 import android.content.pm.PackageManager
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
@@ -39,12 +42,35 @@ class EkycActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ekyc)
 
+        val toolbar: Toolbar = findViewById(R.id.toolbarEKYC)
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            title = "Nhận diện khuôn mặt"
+            setDisplayHomeAsUpEnabled(true)
+        }
+
         imgFace = findViewById(R.id.imgFace)
         btnCapture = findViewById(R.id.btnCapture)
         btnSubmit = findViewById(R.id.btnSubmit)
 
         btnCapture.setOnClickListener { openCameraWithPermissionCheck() }
         btnSubmit.setOnClickListener { handleEkycLogic() }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_add_customer, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun openCameraWithPermissionCheck() {

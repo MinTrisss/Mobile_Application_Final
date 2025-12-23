@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -12,6 +14,7 @@ import android.widget.GridLayout
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 
 data class Movie(val title: String, val price: Double)
@@ -43,10 +46,33 @@ class MovieTicketPaymentActivity : BasePaymentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie_ticket_payment)
 
+        val toolbar: Toolbar = findViewById(R.id.toolbarMovieTicketPayment)
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            title = "Mua vé xem phim"
+            setDisplayHomeAsUpEnabled(true)
+        }
+
         initViews()
         setupSpinners()
         createSeats()
         initActions()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_add_customer, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun initViews() {

@@ -23,7 +23,11 @@ import android.net.Uri
 import android.widget.ImageView
 import android.content.Intent
 import android.app.Activity
-
+import android.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 
 class EditCustomerActivity : AppCompatActivity() {
@@ -39,6 +43,9 @@ class EditCustomerActivity : AppCompatActivity() {
     private lateinit var btnUpdate: Button
     private lateinit var btnChooseImage: Button
     private lateinit var imgAvatarPreview: ImageView
+    private lateinit var auth: FirebaseAuth
+    private var currentOTP: String = ""
+
     private var imageUri: Uri? = null
     private val PICK_IMAGE_REQUEST = 1001
 
@@ -60,7 +67,7 @@ class EditCustomerActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbarEditCustomer)
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
-            title = "Edit Student"
+            title = "Cập nhật thông tin khách hàng"
             setDisplayHomeAsUpEnabled(true)
         }
 
@@ -76,6 +83,11 @@ class EditCustomerActivity : AppCompatActivity() {
 
         btnUpdate.setOnClickListener {
             updateCustomer()
+        }
+
+        // Giả sử bạn có btnChangePass trong XML
+        findViewById<Button>(R.id.btnGoToChangePass).setOnClickListener {
+            sendOTPAndShowDialog()
         }
 
         edtDOB.setOnClickListener {
@@ -187,6 +199,113 @@ class EditCustomerActivity : AppCompatActivity() {
             imageUri = data?.data
             imgAvatarPreview.setImageURI(imageUri)
         }
+    }
+
+    private fun hashPassword(password: String): String {
+        val bytes = password.toByteArray()
+        val md = java.security.MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        return digest.fold("") { str, it -> str + "%02x".format(it) }
+    }
+
+    private fun performUpdatePassword(newPass: String) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val hashedPass = hashPassword(newPass) // Dùng lại hàm hash của bạn
+
+        user?.updatePassword(newPass) // 1. Cập nhật mật khẩu hệ thống
+            ?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // 2. Cập nhật mật khẩu lưu tại Firestore để LoginActivity của bạn không bị lỗi
+                    db.collection("customers").document(uid)
+                        .update("password", hashedPass)
+                        .addOnSuccessListener {
+                            Toast.makeText(this, "Đã thay đổi mật khẩu mới!", Toast.LENGTH_SHORT).show()
+                            finish()
+                        }
+                } else {
+                    Toast.makeText(this, "Lỗi Firebase Auth: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    private fun sendOTPAndShowDialog() {
+        val userEmail = edtEmail.text.toString().trim() // Lấy email từ ô nhập liệu
+
+        if (userEmail.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập email trước", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        currentOTP = Random.nextInt(100000, 999999).toString()
+
+        lifecycleScope.launch {
+            // Bạn cần đảm bảo đã có class GMailSender trong project
+            val isSent = GMailSender.sendOTPEmail(userEmail, currentOTP)
+            if (isSent) {
+                showOTPDialog()
+            } else {
+                Toast.makeText(this@EditCustomerActivity, "Gửi mail thất bại!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun showOTPDialog() {
+        val inputEditTextField = EditText(this)
+        inputEditTextField.hint = "Nhập mã 6 số"
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Xác thực OTP")
+            .setMessage("Vui lòng nhập mã OTP đã gửi đến email để tiếp tục đổi mật khẩu.")
+            .setView(inputEditTextField)
+            .setCancelable(false)
+            .setPositiveButton("Xác nhận") { _, _ ->
+                val enteredOTP = inputEditTextField.text.toString()
+                if (enteredOTP == currentOTP) {
+                    showNewPasswordDialog()
+                } else {
+                    Toast.makeText(this, "Mã OTP không chính xác!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Hủy bỏ", null)
+            .create()
+        dialog.show()
+    }
+
+    private fun showNewPasswordDialog() {
+        val layout = androidx.appcompat.widget.LinearLayoutCompat(this)
+        layout.orientation = androidx.appcompat.widget.LinearLayoutCompat.VERTICAL
+        layout.setPadding(50, 40, 50, 10)
+
+        val edtNewPass = EditText(this)
+        edtNewPass.hint = "Mật khẩu mới (tối thiểu 6 ký tự)"
+        edtNewPass.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+
+        val edtConfirmPass = EditText(this)
+        edtConfirmPass.hint = "Xác nhận mật khẩu mới"
+        edtConfirmPass.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+
+        layout.addView(edtNewPass)
+        layout.addView(edtConfirmPass)
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Đặt mật khẩu mới")
+            .setView(layout)
+            .setCancelable(false)
+            .setPositiveButton("Cập nhật") { _, _ ->
+                val newPass = edtNewPass.text.toString()
+                val confirmPass = edtConfirmPass.text.toString()
+
+                if (newPass.length < 6) {
+                    Toast.makeText(this, "Mật khẩu quá ngắn!", Toast.LENGTH_SHORT).show()
+                } else if (newPass != confirmPass) {
+                    Toast.makeText(this, "Mật khẩu xác nhận không khớp!", Toast.LENGTH_SHORT).show()
+                } else {
+                    performUpdatePassword(newPass)
+                }
+            }
+            .setNegativeButton("Hủy", null)
+            .create()
+        dialog.show()
     }
 
     private fun loadCustomerData() {

@@ -5,6 +5,14 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarEditInterestRate"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:title="Edit Loan Interest"
+        android:titleTextColor="@android:color/white"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

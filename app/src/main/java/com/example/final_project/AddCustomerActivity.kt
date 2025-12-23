@@ -272,8 +272,8 @@ class AddCustomerActivity : AppCompatActivity() {
             "gender" to gender,
             "address" to address,
             "avtURL" to avatarUrl,
-            "ekycStatus" to "pending",
-            "status" to "normal",
+            "ekycStatus" to "Chờ duyệt",
+            "status" to "Hoạt động",
             "role" to "customer",
             "createdAt" to FieldValue.serverTimestamp()
         )
@@ -308,7 +308,7 @@ class AddCustomerActivity : AppCompatActivity() {
             "accountId" to accountId,
             "uid" to uid,
             "type" to "checking",
-            "balance" to 10000, // hoặc số khởi tạo
+            "balance" to 10000,
             "createdAt" to FieldValue.serverTimestamp()
         )
 

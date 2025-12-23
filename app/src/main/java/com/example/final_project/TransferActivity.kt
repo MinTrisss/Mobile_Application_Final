@@ -17,6 +17,9 @@ import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 import android.content.Intent
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.widget.Toolbar
 
 
 class TransferActivity : AppCompatActivity() {
@@ -41,6 +44,13 @@ class TransferActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_transfer)
 
+        val toolbar: Toolbar = findViewById(R.id.toolbarTransfer)
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            title = "Rút / Nạp tiền"
+            setDisplayHomeAsUpEnabled(true)
+        }
+
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
@@ -49,6 +59,21 @@ class TransferActivity : AppCompatActivity() {
         loadSenderBalance()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_add_customer, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
     private fun initViews() {
         edtReceiverAccountNumber = findViewById(R.id.edtReceiverAccountNumber)
         btnCheckReceiver = findViewById(R.id.btnCheckReceiver)

@@ -1,12 +1,15 @@
 package com.example.final_project
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Spinner
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -27,6 +30,13 @@ class EditInterestRateActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_interest_rate)
 
+        val toolbar: Toolbar = findViewById(R.id.toolbarEditInterestRate)
+        setSupportActionBar(toolbar)
+        supportActionBar?.apply {
+            title = "Chỉnh sửa lãi suất"
+            setDisplayHomeAsUpEnabled(true)
+        }
+
         spinnerTerm = findViewById(R.id.spinnerTerm)
         edtInterestRate = findViewById(R.id.edtInterestRate)
         btnSaveRate = findViewById(R.id.btnSaveRate)
@@ -40,6 +50,22 @@ class EditInterestRateActivity : AppCompatActivity() {
         loadCurrentRate()
         loadCurrentLoanRate()
         initActions()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_add_customer, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun initActions() {

@@ -13,14 +13,13 @@
         android:orientation="vertical"
         android:layout_marginTop="22dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mua vé xem phim"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#1F2937"
-            android:layout_marginBottom="16dp" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarMovieTicketPayment"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:title="Edit Loan Interest"
+            android:titleTextColor="@android:color/white"/>
 
         <LinearLayout
             android:layout_width="match_parent"
